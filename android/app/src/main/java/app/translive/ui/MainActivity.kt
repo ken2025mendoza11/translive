@@ -2,6 +2,7 @@ package app.translive.ui
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import androidx.activity.ComponentActivity
@@ -20,6 +21,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -34,6 +36,8 @@ import app.translive.data.Dictionary
 import app.translive.data.Prefs
 import app.translive.data.TargetApp
 import app.translive.engine.LookupChain
+import app.translive.update.AppUpdater
+import app.translive.update.UpdateOffer
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -105,6 +109,7 @@ private fun Home(
     if (!overlay) Button(onClick = {
         activity.startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:${activity.packageName}")))
     }) { Text("Allow display over other apps") }
+    UpdateRow(activity)
     Text("Translate apps", fontWeight = FontWeight.Bold, color = Navy)
     apps.forEach { app ->
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -120,6 +125,58 @@ private fun Home(
     }
     Button(onClick = openSample) { Text("Try sample phrases") }
     Button(onClick = openSettings) { Text("Settings") }
+}
+
+@Composable
+private fun UpdateRow(activity: MainActivity) {
+    var status by remember { mutableStateOf("Checking for an update…") }
+    var offer by remember { mutableStateOf<UpdateOffer?>(null) }
+    var busy by remember { mutableStateOf(false) }
+    var check by remember { mutableIntStateOf(0) }
+
+    DisposableEffect(check) {
+        AppUpdater.check(
+            activity,
+            onReady = { next ->
+                offer = next
+                status = if (next == null) "You’re on the latest version." else "Version ${next.versionName} is ready."
+            },
+            onError = { status = "Couldn’t check just now." },
+        )
+        onDispose { }
+    }
+
+    Text(status, color = Color(0xFF5D6B86))
+    val ready = offer
+    if (ready != null) {
+        Button(
+            onClick = {
+                if (Build.VERSION.SDK_INT >= 26 && !activity.packageManager.canRequestPackageInstalls()) {
+                    activity.startActivity(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:${activity.packageName}")))
+                    status = "Allow TransLIVE to install updates, then tap Update again."
+                    return@Button
+                }
+                busy = true
+                status = "Downloading the update…"
+                AppUpdater.download(
+                    activity,
+                    ready.apkUrl,
+                    onDone = {
+                        busy = false
+                        status = "Tap Update on the next screen. It replaces this app."
+                    },
+                    onError = { message ->
+                        busy = false
+                        status = message
+                    },
+                )
+            },
+            enabled = !busy,
+            modifier = Modifier.fillMaxWidth(),
+        ) { Text(if (busy) "Downloading…" else "Update") }
+    } else {
+        Button(onClick = { check++ }, modifier = Modifier.fillMaxWidth()) { Text("Check for update") }
+    }
 }
 
 @Composable
