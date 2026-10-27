@@ -11,6 +11,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.Display
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
@@ -18,11 +19,14 @@ import android.view.accessibility.AccessibilityWindowInfo
 import app.translive.data.Dictionary
 import app.translive.data.PhoneCache
 import app.translive.data.Prefs
+import app.translive.engine.BoldMeter
 import app.translive.engine.Chrome
 import app.translive.engine.ExcludedScreens
+import app.translive.engine.ForegroundPick
 import app.translive.engine.KeyMatch
 import app.translive.engine.Layer
 import app.translive.engine.LookupChain
+import app.translive.engine.ShotPolicy
 import app.translive.engine.TextClean
 import app.translive.overlay.OverlayController
 import app.translive.overlay.Patch
@@ -46,8 +50,11 @@ class TransLiveAccessibilityService : AccessibilityService() {
     private var scrolling = false
     private var awaySince = 0L
     private var foreground = false
-    private var lastMotion = 0L
+    private var lastScroll = 0L
     private var shotAt = 0L
+    private var lastColorShot = 0L
+    private var retryPending = false
+    private var suppressRetry = false
     private var pendingScrollDy = 0
     private var nextSlot = 1
     private var lastOcr = 0L
@@ -99,8 +106,8 @@ class TransLiveAccessibilityService : AccessibilityService() {
         if (type == AccessibilityEvent.TYPE_WINDOWS_CHANGED || type == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
             postWatch(0)
         }
-        if (type == AccessibilityEvent.TYPE_VIEW_SCROLLED || type == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED) {
-            lastMotion = android.os.SystemClock.uptimeMillis()
+        if (type == AccessibilityEvent.TYPE_VIEW_SCROLLED) {
+            lastScroll = android.os.SystemClock.uptimeMillis()
         }
         if (pkg.isNotEmpty() && !prefs.isEnabled(pkg)) return
         if (type != AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
@@ -148,16 +155,21 @@ class TransLiveAccessibilityService : AccessibilityService() {
 
     private fun watchForeground() {
         if (!::overlay.isInitialized) return
-        val top = topApp()
-        val ours = top != null && prefs.isEnabled(top)
+        if (windows == null) {
+            postWatch(350)
+            return
+        }
+        val pick = currentPick()
+        val ours = pick != null
         val now = android.os.SystemClock.uptimeMillis()
         if (ours) {
             awaySince = 0L
             foreground = true
             overlay.setLive(true)
+            overlay.setOccluders(pick.occluders)
             if (!overlay.attached()) overlay.attach()
             postWatch(350)
-        } else if (top != null) {
+        } else {
             foreground = false
             overlay.setLive(false)
             if (awaySince == 0L) awaySince = now
@@ -167,50 +179,61 @@ class TransLiveAccessibilityService : AccessibilityService() {
             } else {
                 postWatch(350)
             }
-        } else if (overlay.attached()) {
-            postWatch(350)
         }
     }
 
-    private fun topApp(): String? {
-        val list = windows ?: return rootInActiveWindow?.packageName?.toString()
+    private fun currentPick(): ForegroundPick.Pick? {
+        val list = windows ?: return null
+        val wins = ArrayList<ForegroundPick.Win>(list.size)
         for (window in list) {
-            if (window.type != AccessibilityWindowInfo.TYPE_APPLICATION) continue
-            val root = window.root ?: continue
-            val name = root.packageName?.toString()
-            root.recycle()
-            if (name.isNullOrEmpty() || name == packageName) continue
-            return name
+            val root = window.root
+            val pkg = root?.packageName?.toString()
+            root?.recycle()
+            val bounds = Rect()
+            window.getBoundsInScreen(bounds)
+            wins.add(ForegroundPick.Win(window.id, window.type, pkg, bounds.left, bounds.top, bounds.right, bounds.bottom))
+        }
+        val dm = resources.displayMetrics
+        return ForegroundPick.pick(wins, packageName, prefs::isEnabled, dm.widthPixels, dm.heightPixels)
+    }
+
+    private fun windowRoot(id: Int): AccessibilityNodeInfo? {
+        val list = windows ?: return null
+        for (window in list) {
+            if (window.id == id) return window.root
         }
         return null
     }
 
-    private fun settle(fromScroll: Boolean) {
+    private fun settle(fromScroll: Boolean, fromShot: Boolean = false) {
         burstStart = 0L
         val wasScrolling = fromScroll || scrolling
         scrolling = false
         if (!::overlay.isInitialized) return
         overlay.sync(prefs.paused(), prefs.ocr(), prefs.showOriginal())
-        val root = rootInActiveWindow ?: return
-        val pkg = root.packageName?.toString().orEmpty()
-        if (!prefs.isEnabled(pkg)) {
-            root.recycle()
-            foreground = false
-            overlay.setLive(false)
+        val pick = currentPick()
+        if (pick == null) {
+            postWatch(0)
+            return
+        }
+        val root = windowRoot(pick.windowId)
+        if (root == null) {
             postWatch(0)
             return
         }
         awaySince = 0L
         foreground = true
         overlay.setLive(true)
-        overlay.attach()
-        postWatch(350)
+        overlay.setOccluders(pick.occluders)
+        if (!overlay.attached()) {
+            overlay.attach()
+            postWatch(350)
+        }
         val found = bindKeys(ArrayList<Raw>().also { walk(root, it, 0) }, Patch.NODE)
         root.recycle()
         val blocked = ExcludedScreens.detect(found.map { it.zh }) != null
         val ready = ArrayList<Patch>()
         val misses = ArrayList<Raw>()
-        var needShot = latestBitmap == null || shotAt <= lastMotion
         for (raw in found) {
             val cached = cache.get(raw.zh)?.let { TextClean.present(it) }
             val hit = LookupChain.translate(
@@ -230,7 +253,6 @@ class TransLiveAccessibilityService : AccessibilityService() {
             }
             lastReported = raw.zh
             val colors = colorsFor(raw.bounds, previous)
-            if (colors == null) needShot = true
             ready.add(
                 Patch(
                     raw.key,
@@ -247,9 +269,13 @@ class TransLiveAccessibilityService : AccessibilityService() {
         }
         overlay.upsert(Patch.NODE, ready, dropMissing = !wasScrolling, hideUnmatched = wasScrolling)
         if (misses.isNotEmpty() && !prefs.paused()) translateLive(misses, blocked)
-        val ocrNow = !wasScrolling && !prefs.paused() && prefs.ocr() &&
-            android.os.SystemClock.uptimeMillis() - lastOcr >= 1200
-        if (needShot || ocrNow) requestShot(runOcr = ocrNow)
+        val now = android.os.SystemClock.uptimeMillis()
+        val missingColors = ready.any { Color.alpha(it.bg) == 0 }
+        val ocr = ShotPolicy.ocrShot(now, lastOcr, wasScrolling, prefs.paused(), prefs.ocr(), fromShot)
+        val color = ShotPolicy.colorShot(
+            now, latestBitmap != null, missingColors, lastScroll, shotAt, lastColorShot, wasScrolling, fromShot,
+        )
+        if (ocr || color) requestShot(runOcr = ocr)
     }
 
     private fun translateLive(misses: List<Raw>, blocked: Boolean) {
@@ -280,7 +306,12 @@ class TransLiveAccessibilityService : AccessibilityService() {
                         source,
                     ),
                 )
-                if (colors == null) requestShot(runOcr = false)
+                if (colors == null) {
+                    val now = android.os.SystemClock.uptimeMillis()
+                    if (ShotPolicy.colorShot(now, latestBitmap != null, true, lastScroll, shotAt, lastColorShot, scrolling, false)) {
+                        requestShot(runOcr = false)
+                    }
+                }
             }.addOnFailureListener { inFlight.remove(raw.zh) }
         }
     }
@@ -288,15 +319,19 @@ class TransLiveAccessibilityService : AccessibilityService() {
     private fun requestShot(runOcr: Boolean) {
         if (!foreground || shotBusy || Build.VERSION.SDK_INT < 30) return
         val now = android.os.SystemClock.uptimeMillis()
-        if (runOcr && now - lastOcr < 1200) {
+        if (!suppressRetry && runOcr && now - lastOcr < ShotPolicy.OCR_GAP_MS) {
             if (latestBitmap != null) return
         }
         if (runOcr && (batteryLow() || (prefs.dataSaver() && metered()))) {
             if (latestBitmap != null) return
         }
         shotBusy = true
+        lastColorShot = now
         if (runOcr) lastOcr = now
+        Log.d("TransLIVE", "shot ocr=$runOcr")
         val windowId = pddWindowId()
+        val isRetry = suppressRetry
+        suppressRetry = false
         val callback = object : TakeScreenshotCallback {
             override fun onSuccess(result: ScreenshotResult) {
                 shotBusy = false
@@ -310,15 +345,21 @@ class TransLiveAccessibilityService : AccessibilityService() {
                 if (runOcr && Build.VERSION.SDK_INT < 34) maskOwnPatches(bitmap)
                 handler.post {
                     if (!::overlay.isInitialized || !foreground) return@post
-                    settle(fromScroll = false)
+                    settle(fromScroll = false, fromShot = true)
                     if (runOcr) readPhotoText(bitmap)
                 }
             }
 
             override fun onFailure(errorCode: Int) {
                 shotBusy = false
-                if (errorCode == ERROR_TAKE_SCREENSHOT_INTERVAL_TIME_SHORT && foreground) {
-                    handler.postDelayed({ requestShot(runOcr) }, 1000)
+                if (isRetry) return
+                if (errorCode == ERROR_TAKE_SCREENSHOT_INTERVAL_TIME_SHORT && foreground && !retryPending) {
+                    retryPending = true
+                    handler.postDelayed({
+                        retryPending = false
+                        suppressRetry = true
+                        requestShot(runOcr)
+                    }, 1000)
                 }
             }
         }
@@ -330,22 +371,12 @@ class TransLiveAccessibilityService : AccessibilityService() {
     }
 
     private fun pddWindowId(): Int {
-        val list = windows ?: return -1
-        var id = -1
-        shotFrame = Rect()
-        for (window in list) {
-            if (window.type != AccessibilityWindowInfo.TYPE_APPLICATION) continue
-            val root = window.root ?: continue
-            val name = root.packageName?.toString()
-            val match = name != null && prefs.isEnabled(name)
-            if (match && id == -1) {
-                id = window.id
-                window.getBoundsInScreen(shotFrame)
-            }
-            root.recycle()
-            if (match) break
+        val pick = currentPick() ?: run {
+            shotFrame = Rect()
+            return -1
         }
-        return id
+        shotFrame = Rect(pick.l, pick.t, pick.r, pick.b)
+        return pick.windowId
     }
 
     private fun maskOwnPatches(bitmap: Bitmap) {
@@ -428,7 +459,7 @@ class TransLiveAccessibilityService : AccessibilityService() {
     }
 
     private fun colorsFor(bounds: Rect, previous: Patch?): Pair<Int, Int>? {
-        val fresh = latestBitmap != null && shotAt > lastMotion
+        val fresh = latestBitmap != null && shotAt > lastScroll
         if (!fresh) {
             if (previous != null && Color.alpha(previous.bg) != 0) return previous.bg to previous.fg
             return null
@@ -444,38 +475,21 @@ class TransLiveAccessibilityService : AccessibilityService() {
     }
 
     private fun strokeBold(bounds: Rect): Boolean? {
-        if (latestBitmap == null || shotAt <= lastMotion) return null
+        if (latestBitmap == null || shotAt <= lastScroll) return null
         val colors = sample(bounds) ?: return null
         val bitmap = latestBitmap ?: return null
         val originX = if (Build.VERSION.SDK_INT >= 34) shotFrame.left else 0
         val originY = if (Build.VERSION.SDK_INT >= 34) shotFrame.top else 0
-        val left = bounds.left - originX
-        val right = bounds.right - originX
-        val top = bounds.top - originY
-        val bottom = bounds.bottom - originY
-        if (right <= left || bottom <= top) return null
-        var ink = 0
-        var seen = 0
-        val stepX = ((right - left) / 8).coerceAtLeast(1)
-        val stepY = ((bottom - top) / 4).coerceAtLeast(1)
-        var y = top
-        while (y < bottom) {
-            var x = left
-            while (x < right) {
-                if (x in 0 until bitmap.width && y in 0 until bitmap.height) {
-                    val p = bitmap.getPixel(x, y)
-                    val dist = kotlin.math.abs(Color.red(p) - Color.red(colors.first)) +
-                        kotlin.math.abs(Color.green(p) - Color.green(colors.first)) +
-                        kotlin.math.abs(Color.blue(p) - Color.blue(colors.first))
-                    if (dist > 80) ink++
-                    seen++
-                }
-                x += stepX
-            }
-            y += stepY
-        }
-        if (seen < 6) return null
-        return ink.toFloat() / seen > 0.18f
+        val left = (bounds.left - originX).coerceAtLeast(0)
+        val top = (bounds.top - originY).coerceAtLeast(0)
+        val right = (bounds.right - originX).coerceAtMost(bitmap.width)
+        val bottom = (bounds.bottom - originY).coerceAtMost(bitmap.height)
+        val w = right - left
+        val h = bottom - top
+        if (w < 1 || h < 1) return null
+        val pixels = IntArray(w * h)
+        bitmap.getPixels(pixels, 0, w, left, top, w, h)
+        return BoldMeter.isBold(pixels, w, h, colors.first)
     }
 
     private fun bindKeys(found: List<Raw>, source: Int): List<Raw> {

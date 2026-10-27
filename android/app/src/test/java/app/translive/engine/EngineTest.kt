@@ -145,10 +145,88 @@ class KeyMatchTest {
     }
 }
 
-class ReleaseVersionTest {
-    @Test fun readsVersionName() {
-        val gradle = "        versionCode = 7\n        versionName = \"1.4.2\"\n"
-        assertEquals("1.4.2", ReleaseVersion.read(gradle))
-        assertEquals("", ReleaseVersion.read("versionName = \"\""))
+class ShotPolicyTest {
+    @Test fun colorAndOcrGates() {
+        assertFalse(ShotPolicy.colorShot(1000, false, true, 0, 0, 0, scrolling = true, fromShot = false))
+        assertFalse(ShotPolicy.colorShot(1000, false, true, 0, 0, 0, scrolling = false, fromShot = true))
+        assertFalse(ShotPolicy.colorShot(1000, false, true, 0, 0, 500, scrolling = false, fromShot = false))
+        assertTrue(ShotPolicy.colorShot(2000, false, false, 0, 0, 0, scrolling = false, fromShot = false))
+        assertTrue(ShotPolicy.colorShot(2000, true, true, 0, 100, 0, scrolling = false, fromShot = false))
+        assertTrue(ShotPolicy.colorShot(2000, true, false, 150, 100, 0, scrolling = false, fromShot = false))
+        assertFalse(ShotPolicy.colorShot(2000, true, false, 100, 150, 0, scrolling = false, fromShot = false))
+
+        assertFalse(ShotPolicy.ocrShot(1000, 0, scrolling = false, paused = false, ocrOn = true, fromShot = false))
+        assertFalse(ShotPolicy.ocrShot(3000, 0, scrolling = false, paused = false, ocrOn = true, fromShot = true))
+        assertFalse(ShotPolicy.ocrShot(3000, 0, scrolling = true, paused = false, ocrOn = true, fromShot = false))
+        assertFalse(ShotPolicy.ocrShot(3000, 0, scrolling = false, paused = true, ocrOn = true, fromShot = false))
+        assertFalse(ShotPolicy.ocrShot(3000, 0, scrolling = false, paused = false, ocrOn = false, fromShot = false))
+        assertTrue(ShotPolicy.ocrShot(3000, 0, scrolling = false, paused = false, ocrOn = true, fromShot = false))
+    }
+}
+
+class ForegroundPickTest {
+    private val enabled = { pkg: String -> pkg == "com.xunmeng.pinduoduo" }
+    private val pdd = ForegroundPick.Win(1, 1, "com.xunmeng.pinduoduo", 0, 0, 1000, 2000)
+
+    @Test fun picksTheShoppingAppAndOccluders() {
+        val only = ForegroundPick.pick(listOf(pdd), "app.translive", enabled, 1000, 2000)
+        assertEquals(1, only!!.windowId)
+        assertTrue(only.occluders.isEmpty())
+
+        val overlay = ForegroundPick.Win(9, 4, "app.translive", 900, 200, 1000, 500)
+        val own = ForegroundPick.Win(8, 1, "app.translive", 0, 0, 1000, 2000)
+        val ignored = ForegroundPick.pick(listOf(overlay, own, pdd), "app.translive", enabled, 1000, 2000)
+        assertEquals("com.xunmeng.pinduoduo", ignored!!.pkg)
+        assertTrue(ignored.occluders.isEmpty())
+
+        val small = ForegroundPick.Win(2, 1, "com.vivo.floating", 100, 100, 700, 1100)
+        val withSmall = ForegroundPick.pick(listOf(small, pdd), "app.translive", enabled, 1000, 2000)
+        assertEquals(1, withSmall!!.windowId)
+        assertEquals(1, withSmall.occluders.size)
+
+        val other = ForegroundPick.Win(3, 1, "com.android.launcher", 0, 0, 1000, 2000)
+        assertEquals(null, ForegroundPick.pick(listOf(other, pdd), "app.translive", enabled, 1000, 2000))
+        assertEquals(null, ForegroundPick.pick(listOf(other), "app.translive", enabled, 1000, 2000))
+
+        val partial = ForegroundPick.Win(4, 1, "com.xunmeng.pinduoduo", 0, 0, 800, 1000)
+        assertEquals(null, ForegroundPick.pick(listOf(partial), "app.translive", enabled, 1000, 2000))
+
+        assertTrue(ForegroundPick.occluded(0, 0, 10, 10, listOf(intArrayOf(5, 5, 15, 15))))
+        assertFalse(ForegroundPick.occluded(0, 0, 10, 10, listOf(intArrayOf(10, 0, 20, 10))))
+        assertFalse(ForegroundPick.occluded(0, 0, 10, 10, emptyList()))
+    }
+}
+
+class BoldMeterTest {
+    private val white = 0xFFFFFFFF.toInt()
+    private val black = 0xFF000000.toInt()
+
+    private fun bars(w: Int, h: Int, bar: Int): IntArray {
+        val pixels = IntArray(w * h) { white }
+        for (y in 0 until h) {
+            var x = 0
+            while (x + bar <= w) {
+                for (i in 0 until bar) pixels[y * w + x + i] = black
+                x += bar + bar
+            }
+        }
+        return pixels
+    }
+
+    @Test fun strokeWidthNotCoverage() {
+        assertEquals(false, BoldMeter.isBold(bars(40, 40, 3), 40, 40, white))
+        assertEquals(true, BoldMeter.isBold(bars(40, 40, 6), 40, 40, white))
+
+        val tight = bars(20, 40, 6)
+        val wide = IntArray(300 * 48) { white }
+        for (y in 0 until 40) {
+            for (x in 0 until 20) wide[(y + 4) * 300 + (x + 40)] = tight[y * 20 + x]
+        }
+        assertEquals(BoldMeter.isBold(tight, 20, 40, white), BoldMeter.isBold(wide, 300, 48, white))
+
+        val few = IntArray(40 * 40) { white }
+        for (i in 0 until 5) few[i] = black
+        assertEquals(null, BoldMeter.isBold(few, 40, 40, white))
+        assertEquals(null, BoldMeter.isBold(IntArray(40 * 40) { white }, 40, 40, white))
     }
 }

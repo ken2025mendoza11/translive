@@ -15,6 +15,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import app.translive.R
+import app.translive.engine.ForegroundPick
 import kotlin.math.roundToInt
 
 data class Patch(
@@ -263,11 +264,19 @@ class OverlayController(base: Context) : EdgeHost {
     private var edgeSig = ""
     private var nextId = 1
     private var live = false
+    private var occluders: List<IntArray> = emptyList()
 
     fun attached() = overlayAdded || edgeAdded
 
     fun setLive(on: Boolean) {
+        if (live == on) return
         live = on
+        if (overlayAdded) render()
+    }
+
+    fun setOccluders(next: List<IntArray>) {
+        if (sameOccluders(occluders, next)) return
+        occluders = next
         if (overlayAdded) render()
     }
 
@@ -356,7 +365,13 @@ class OverlayController(base: Context) : EdgeHost {
 
     private fun render() {
         if (!overlayAdded) return
-        val visible = if (!live || paused || showOriginal) emptyList() else keepTight(items.values.filter { it.key !in suppressed })
+        val visible = if (!live || paused || showOriginal) emptyList() else keepTight(
+            items.values.filter { patch ->
+                patch.key !in suppressed && !ForegroundPick.occluded(
+                    patch.bounds.left, patch.bounds.top, patch.bounds.right, patch.bounds.bottom, occluders,
+                )
+            },
+        )
         overlay.alpha = 1f
         overlay.setPatches(visible)
         if (edgeAdded) ensureEdge(force = false)
@@ -403,6 +418,12 @@ class OverlayController(base: Context) : EdgeHost {
             edgeAdded = false
             edgeSig = ""
         }
+    }
+
+    private fun sameOccluders(a: List<IntArray>, b: List<IntArray>): Boolean {
+        if (a.size != b.size) return false
+        for (i in a.indices) if (!a[i].contentEquals(b[i])) return false
+        return true
     }
 
     private fun screen() = Rect(0, 0, context.resources.displayMetrics.widthPixels, context.resources.displayMetrics.heightPixels)

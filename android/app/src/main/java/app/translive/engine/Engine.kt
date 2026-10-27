@@ -316,10 +316,125 @@ object KeyMatch {
     }
 }
 
-object ReleaseVersion {
-    fun read(gradle: String): String {
-        val name = Regex("""versionName\s*=\s*"([^"]+)"""").find(gradle)?.groupValues?.get(1).orEmpty()
-        return name
+object ShotPolicy {
+    const val COLOR_GAP_MS = 700L // min gap between colour-only shots
+    const val OCR_GAP_MS = 1200L // min gap between OCR shots
+
+    fun colorShot(
+        now: Long,
+        hasBitmap: Boolean,
+        missingColors: Boolean,
+        lastScroll: Long,
+        shotAt: Long,
+        lastColorShot: Long,
+        scrolling: Boolean,
+        fromShot: Boolean,
+    ): Boolean {
+        if (scrolling || fromShot) return false
+        if (now - lastColorShot < COLOR_GAP_MS) return false
+        return !hasBitmap || missingColors || lastScroll > shotAt
+    }
+
+    fun ocrShot(
+        now: Long,
+        lastOcr: Long,
+        scrolling: Boolean,
+        paused: Boolean,
+        ocrOn: Boolean,
+        fromShot: Boolean,
+    ): Boolean = !fromShot && !scrolling && !paused && ocrOn && now - lastOcr >= OCR_GAP_MS
+}
+
+object ForegroundPick {
+    const val TYPE_APPLICATION = 1 // == AccessibilityWindowInfo.TYPE_APPLICATION
+    const val MIN_APP_AREA = 0.5f // enabled window must cover >= 50% of screen
+    const val FULL_COVER = 0.9f // an app window above covering >= 90% means ours is hidden
+
+    data class Win(val id: Int, val type: Int, val pkg: String?, val l: Int, val t: Int, val r: Int, val b: Int)
+    data class Pick(
+        val windowId: Int,
+        val pkg: String,
+        val l: Int,
+        val t: Int,
+        val r: Int,
+        val b: Int,
+        val occluders: List<IntArray>,
+    )
+
+    fun pick(wins: List<Win>, ownPkg: String, enabled: (String) -> Boolean, screenW: Int, screenH: Int): Pick? {
+        val screen = screenW.toLong() * screenH
+        val occ = ArrayList<IntArray>()
+        for (w in wins) {
+            if (w.type != TYPE_APPLICATION) continue
+            val pkg = w.pkg ?: continue
+            if (pkg == ownPkg) continue
+            val area = (w.r - w.l).toLong().coerceAtLeast(0) * (w.b - w.t).toLong().coerceAtLeast(0)
+            if (enabled(pkg) && area >= screen * MIN_APP_AREA) return Pick(w.id, pkg, w.l, w.t, w.r, w.b, occ.toList())
+            if (area >= screen * FULL_COVER) return null
+            occ.add(intArrayOf(w.l, w.t, w.r, w.b))
+        }
+        return null
+    }
+
+    fun occluded(l: Int, t: Int, r: Int, b: Int, occluders: List<IntArray>): Boolean =
+        occluders.any { o -> l < o[2] && o[0] < r && t < o[3] && o[1] < b }
+}
+
+object BoldMeter {
+    const val INK_DIST = 80 // |dR|+|dG|+|dB| from bg counts as ink
+    const val MIN_INK_PX = 20 // fewer ink pixels -> unknown
+    const val MIN_GLYPH_H = 8 // tight ink box shorter than this -> unknown
+    const val BOLD_STROKE_RATIO = 0.11f // median stroke / glyph height
+
+    fun isBold(pixels: IntArray, w: Int, h: Int, bg: Int): Boolean? {
+        if (w <= 0 || h <= 0 || pixels.size < w * h) return null
+        val bgR = (bg shr 16) and 0xFF
+        val bgG = (bg shr 8) and 0xFF
+        val bgB = bg and 0xFF
+        var minX = w
+        var minY = h
+        var maxX = -1
+        var maxY = -1
+        var inkCount = 0
+        val ink = BooleanArray(w * h)
+        for (y in 0 until h) {
+            var row = y * w
+            for (x in 0 until w) {
+                val p = pixels[row + x]
+                val dist = kotlin.math.abs(((p shr 16) and 0xFF) - bgR) +
+                    kotlin.math.abs(((p shr 8) and 0xFF) - bgG) +
+                    kotlin.math.abs((p and 0xFF) - bgB)
+                if (dist > INK_DIST) {
+                    ink[row + x] = true
+                    inkCount++
+                    if (x < minX) minX = x
+                    if (y < minY) minY = y
+                    if (x > maxX) maxX = x
+                    if (y > maxY) maxY = y
+                }
+            }
+        }
+        if (inkCount < MIN_INK_PX || maxY < minY) return null
+        val boxH = maxY - minY + 1
+        if (boxH < MIN_GLYPH_H) return null
+        val runs = ArrayList<Int>()
+        for (y in minY..maxY) {
+            var run = 0
+            val row = y * w
+            for (x in minX..maxX) {
+                if (ink[row + x]) run++
+                else if (run > 0) {
+                    runs.add(run)
+                    run = 0
+                }
+            }
+            if (run > 0) runs.add(run)
+        }
+        if (runs.isEmpty()) return null
+        runs.sort()
+        val mid = runs.size / 2
+        val median = if (runs.size % 2 == 1) runs[mid].toFloat() else (runs[mid - 1] + runs[mid]) / 2f
+        return median / boxH >= BOLD_STROKE_RATIO
     }
 }
 
