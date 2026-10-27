@@ -11,8 +11,8 @@ android {
         applicationId = "app.translive"
         minSdk = 26
         targetSdk = 37
-        versionCode = 8
-        versionName = "1.4.3"
+        versionCode = 10
+        versionName = "1.4.5"
         ndk {
             abiFilters += listOf("arm64-v8a")
         }

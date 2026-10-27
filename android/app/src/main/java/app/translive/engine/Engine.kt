@@ -346,9 +346,13 @@ object ShotPolicy {
 }
 
 object ForegroundPick {
-    const val TYPE_APPLICATION = 1 // == AccessibilityWindowInfo.TYPE_APPLICATION
-    const val MIN_APP_AREA = 0.5f // enabled window must cover >= 50% of screen
-    const val FULL_COVER = 0.9f // an app window above covering >= 90% means ours is hidden
+    // Values of AccessibilityWindowInfo.TYPE_* (kept here so this object has no android types).
+    const val TYPE_APPLICATION = 1
+    const val TYPE_INPUT_METHOD = 2
+    const val TYPE_SYSTEM = 3
+    const val MIN_APP_AREA = 0.5f // the shopping app's main window must cover >= 50% of the screen
+    const val FULL_COVER = 0.9f // a window above covering >= 90% of the screen hides the shopping app
+    const val BAR_MAX = 0.08f // a system strip this thin touching a screen edge is a status/navigation bar
 
     data class Win(val id: Int, val type: Int, val pkg: String?, val l: Int, val t: Int, val r: Int, val b: Int)
     data class Pick(
@@ -359,25 +363,86 @@ object ForegroundPick {
         val r: Int,
         val b: Int,
         val occluders: List<IntArray>,
+        val appWindows: List<Win>,
     )
 
+    /**
+     * [wins] is top-most first, as AccessibilityService.getWindows() returns it.
+     * The first application window of an enabled package starts the "run". The run keeps every later
+     * application window of that same package (dialogs, sheets, popups and the activity window) and
+     * ends at the first application window of a different package. Input-method and system windows
+     * are handled by type wherever they appear. The main window is the largest window in the run
+     * (the lowest one on a tie) and must cover MIN_APP_AREA.
+     */
     fun pick(wins: List<Win>, ownPkg: String, enabled: (String) -> Boolean, screenW: Int, screenH: Int): Pick? {
         val screen = screenW.toLong() * screenH
         val occ = ArrayList<IntArray>()
+        val run = ArrayList<Win>()
+        var runPkg: String? = null
         for (w in wins) {
-            if (w.type != TYPE_APPLICATION) continue
-            val pkg = w.pkg ?: continue
-            if (pkg == ownPkg) continue
-            val area = (w.r - w.l).toLong().coerceAtLeast(0) * (w.b - w.t).toLong().coerceAtLeast(0)
-            if (enabled(pkg) && area >= screen * MIN_APP_AREA) return Pick(w.id, pkg, w.l, w.t, w.r, w.b, occ.toList())
-            if (area >= screen * FULL_COVER) return null
-            occ.add(intArrayOf(w.l, w.t, w.r, w.b))
+            val area = area(w)
+            when (w.type) {
+                TYPE_APPLICATION -> {
+                    val pkg = w.pkg ?: continue // root not ready yet: ignore this window
+                    if (runPkg == null) {
+                        if (pkg != ownPkg && enabled(pkg)) {
+                            runPkg = pkg
+                            run.add(w)
+                        } else {
+                            if (area >= screen * FULL_COVER) return null
+                            occ.add(rect(w))
+                        }
+                    } else if (pkg == runPkg) {
+                        run.add(w)
+                    } else {
+                        break
+                    }
+                }
+                TYPE_INPUT_METHOD -> occ.add(rect(w))
+                TYPE_SYSTEM -> {
+                    if (isBar(w, screenW, screenH)) continue
+                    if (area >= screen * FULL_COVER) return null
+                    occ.add(rect(w))
+                }
+                else -> continue // accessibility overlays (ours too), split-screen divider, magnifier
+            }
         }
-        return null
+        val pkg = runPkg ?: return null
+        var main = run[0]
+        for (w in run) if (area(w) >= area(main)) main = w
+        if (area(main) < screen * MIN_APP_AREA) return null
+        return Pick(main.id, pkg, main.l, main.t, main.r, main.b, occ.toList(), run.toList())
+    }
+
+    /**
+     * What an upper window of the shopping app hides from the windows below it.
+     * A normal dialog/sheet/popup hides its own bounds. A window covering >= FULL_COVER is usually a
+     * transparent full-screen host, so it only hides the box around its own text ([textRects]);
+     * with no text it hides nothing.
+     */
+    fun coverRect(w: Win, textRects: List<IntArray>, screenW: Int, screenH: Int): IntArray? {
+        if (area(w) < screenW.toLong() * screenH * FULL_COVER) return rect(w)
+        if (textRects.isEmpty()) return null
+        return intArrayOf(
+            textRects.minOf { it[0] },
+            textRects.minOf { it[1] },
+            textRects.maxOf { it[2] },
+            textRects.maxOf { it[3] },
+        )
+    }
+
+    fun isBar(w: Win, screenW: Int, screenH: Int): Boolean {
+        val horizontal = (w.b - w.t) <= screenH * BAR_MAX && (w.t <= 0 || w.b >= screenH)
+        val vertical = (w.r - w.l) <= screenW * BAR_MAX && (w.l <= 0 || w.r >= screenW)
+        return horizontal || vertical
     }
 
     fun occluded(l: Int, t: Int, r: Int, b: Int, occluders: List<IntArray>): Boolean =
         occluders.any { o -> l < o[2] && o[0] < r && t < o[3] && o[1] < b }
+
+    private fun area(w: Win): Long = (w.r - w.l).toLong().coerceAtLeast(0) * (w.b - w.t).toLong().coerceAtLeast(0)
+
+    private fun rect(w: Win) = intArrayOf(w.l, w.t, w.r, w.b)
 }
 
 object BoldMeter {

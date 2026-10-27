@@ -283,8 +283,14 @@ class OverlayController(base: Context) : EdgeHost {
     fun attach() {
         live = true
         if (!overlayAdded) {
-            wm.addView(overlay, overlayParams())
-            overlayAdded = true
+            try {
+                wm.addView(overlay, overlayParams())
+                overlayAdded = true
+            } catch (e: RuntimeException) {
+                // BadTokenException / IllegalStateException while the service is (dis)connecting.
+                android.util.Log.w("TransLIVE", "overlay addView failed", e)
+                return
+            }
         }
         ensureEdge(force = false)
         render()
@@ -410,13 +416,21 @@ class OverlayController(base: Context) : EdgeHost {
     fun hide() {
         live = false
         if (overlayAdded) {
-            wm.removeView(overlay)
             overlayAdded = false
+            try {
+                wm.removeView(overlay)
+            } catch (e: IllegalArgumentException) {
+                // Already removed by the system.
+            }
         }
         if (edgeAdded) {
-            wm.removeView(edge)
             edgeAdded = false
             edgeSig = ""
+            try {
+                wm.removeView(edge)
+            } catch (e: IllegalArgumentException) {
+                // Already removed by the system.
+            }
         }
     }
 
@@ -435,12 +449,21 @@ class OverlayController(base: Context) : EdgeHost {
     private fun ensureEdge(force: Boolean) {
         val sig = "$open|$edgeY"
         if (!edgeAdded) {
-            wm.addView(edge, edgeParams())
-            edgeAdded = true
-            edgeSig = sig
+            try {
+                wm.addView(edge, edgeParams())
+                edgeAdded = true
+                edgeSig = sig
+            } catch (e: RuntimeException) {
+                android.util.Log.w("TransLIVE", "edge addView failed", e)
+            }
         } else if (force || sig != edgeSig) {
-            wm.updateViewLayout(edge, edgeParams())
-            edgeSig = sig
+            try {
+                wm.updateViewLayout(edge, edgeParams())
+                edgeSig = sig
+            } catch (e: IllegalArgumentException) {
+                edgeAdded = false
+                edgeSig = ""
+            }
         }
     }
 

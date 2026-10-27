@@ -34,8 +34,16 @@ class ShareActivity : ComponentActivity() {
             }
         }
         val uri = intent.getParcelableExtra<Uri>(android.content.Intent.EXTRA_STREAM) ?: return
-        val stream = contentResolver.openInputStream(uri) ?: return
-        val bitmap = stream.use { BitmapFactory.decodeStream(it) } ?: return
+        val bitmap = try {
+            contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it) }
+        } catch (e: Exception) {
+            null // SecurityException / FileNotFoundException from the sharing app
+        }
+        if (bitmap == null) {
+            lines.clear()
+            lines.add("Could not open that picture.")
+            return
+        }
         val prefs = Prefs(this)
         val dict = Dictionary.load(this)
         val recognizer = TextRecognition.getClient(ChineseTextRecognizerOptions.Builder().build())

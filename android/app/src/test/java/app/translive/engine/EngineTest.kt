@@ -165,32 +165,126 @@ class ShotPolicyTest {
 }
 
 class ForegroundPickTest {
-    private val enabled = { pkg: String -> pkg == "com.xunmeng.pinduoduo" }
-    private val pdd = ForegroundPick.Win(1, 1, "com.xunmeng.pinduoduo", 0, 0, 1000, 2000)
+    private val pddPkg = "com.xunmeng.pinduoduo"
+    private val own = "app.translive"
+    private val enabled = { pkg: String -> pkg == pddPkg }
+    private val sw = 1080
+    private val sh = 2400
+    private val main = ForegroundPick.Win(1, 1, pddPkg, 0, 0, sw, sh)
+    private fun pick(vararg w: ForegroundPick.Win) = ForegroundPick.pick(w.toList(), own, enabled, sw, sh)
+    private fun ids(p: ForegroundPick.Pick?) = p!!.appWindows.map { it.id }
 
-    @Test fun picksTheShoppingAppAndOccluders() {
-        val only = ForegroundPick.pick(listOf(pdd), "app.translive", enabled, 1000, 2000)
-        assertEquals(1, only!!.windowId)
-        assertTrue(only.occluders.isEmpty())
+    @Test fun onlyTheShoppingApp() {
+        val p = pick(main)
+        assertEquals(1, p!!.windowId)
+        assertEquals(listOf(1), ids(p))
+        assertTrue(p.occluders.isEmpty())
+    }
 
-        val overlay = ForegroundPick.Win(9, 4, "app.translive", 900, 200, 1000, 500)
-        val own = ForegroundPick.Win(8, 1, "app.translive", 0, 0, 1000, 2000)
-        val ignored = ForegroundPick.pick(listOf(overlay, own, pdd), "app.translive", enabled, 1000, 2000)
-        assertEquals("com.xunmeng.pinduoduo", ignored!!.pkg)
-        assertTrue(ignored.occluders.isEmpty())
+    @Test fun ownOverlaysAreIgnoredButOwnActivityHidesUs() {
+        val overlay = ForegroundPick.Win(9, 4, own, 900, 200, sw, 500) // TYPE_ACCESSIBILITY_OVERLAY
+        assertEquals(1, pick(overlay, main)!!.windowId)
+        val settings = ForegroundPick.Win(8, 1, own, 0, 0, sw, sh)
+        assertEquals(null, pick(overlay, settings, main))
+    }
 
-        val small = ForegroundPick.Win(2, 1, "com.vivo.floating", 100, 100, 700, 1100)
-        val withSmall = ForegroundPick.pick(listOf(small, pdd), "app.translive", enabled, 1000, 2000)
-        assertEquals(1, withSmall!!.windowId)
-        assertEquals(1, withSmall.occluders.size)
+    @Test fun ownPopupUnderHalfIsPartOfTheApp() {
+        val sku = ForegroundPick.Win(5, 1, pddPkg, 0, 1400, sw, sh) // SKU sheet, 42 %
+        val p = pick(sku, main)
+        assertEquals(1, p!!.windowId)
+        assertEquals(listOf(5, 1), ids(p))
+        assertTrue(p.occluders.isEmpty())
+    }
 
-        val other = ForegroundPick.Win(3, 1, "com.android.launcher", 0, 0, 1000, 2000)
-        assertEquals(null, ForegroundPick.pick(listOf(other, pdd), "app.translive", enabled, 1000, 2000))
-        assertEquals(null, ForegroundPick.pick(listOf(other), "app.translive", enabled, 1000, 2000))
+    @Test fun ownPopupOverHalfKeepsTheActivityAsMain() {
+        val big = ForegroundPick.Win(6, 1, pddPkg, 0, 800, sw, sh) // 67 %
+        val p = pick(big, main)
+        assertEquals(1, p!!.windowId)
+        assertEquals(listOf(6, 1), ids(p))
+    }
 
-        val partial = ForegroundPick.Win(4, 1, "com.xunmeng.pinduoduo", 0, 0, 800, 1000)
-        assertEquals(null, ForegroundPick.pick(listOf(partial), "app.translive", enabled, 1000, 2000))
+    @Test fun ownFullScreenDialogTieKeepsTheLowerWindowAsMain() {
+        val full = ForegroundPick.Win(7, 1, pddPkg, 0, 0, sw, sh)
+        val p = pick(full, main)
+        assertEquals(1, p!!.windowId)
+        assertEquals(listOf(7, 1), ids(p))
+    }
 
+    @Test fun multipleShoppingWindows() {
+        val tip = ForegroundPick.Win(13, 1, pddPkg, 300, 1000, 780, 1150)
+        val sheet = ForegroundPick.Win(14, 1, pddPkg, 0, 1400, sw, sh)
+        val p = pick(tip, sheet, main)
+        assertEquals(listOf(13, 14, 1), ids(p))
+        assertTrue(p!!.occluders.isEmpty())
+    }
+
+    @Test fun vivoSmallWindowIsAnOccluder() {
+        val vivo = ForegroundPick.Win(2, 1, "com.vivo.smallwindow", 100, 300, 700, 1300)
+        val p = pick(vivo, main)
+        assertEquals(1, p!!.windowId)
+        assertEquals(1, p.occluders.size)
+        assertTrue(p.occluders[0].contentEquals(intArrayOf(100, 300, 700, 1300)))
+    }
+
+    @Test fun keyboardIsAnOccluder() {
+        val ime = ForegroundPick.Win(3, 2, "com.sohu.inputmethod.sogou.vivo", 0, 1500, sw, sh)
+        assertEquals(1, pick(ime, main)!!.occluders.size)
+    }
+
+    @Test fun keyboardOverOwnPopup() {
+        val ime = ForegroundPick.Win(3, 2, "com.sohu.inputmethod.sogou.vivo", 0, 1500, sw, sh)
+        val sheet = ForegroundPick.Win(14, 1, pddPkg, 0, 1200, sw, sh)
+        val p = pick(ime, sheet, main)
+        assertEquals(listOf(14, 1), ids(p))
+        assertEquals(1, p!!.occluders.size)
+    }
+
+    @Test fun notificationShade() {
+        val half = ForegroundPick.Win(4, 3, "com.android.systemui", 0, 0, sw, 1300)
+        assertEquals(1, pick(half, main)!!.occluders.size)
+        val full = ForegroundPick.Win(4, 3, "com.android.systemui", 0, 0, sw, sh)
+        assertEquals(null, pick(full, main))
+    }
+
+    @Test fun statusAndNavigationBarsAreNotOccluders() {
+        val status = ForegroundPick.Win(10, 3, "com.android.systemui", 0, 0, sw, 80)
+        val nav = ForegroundPick.Win(11, 3, "com.android.systemui", 0, sh - 144, sw, sh)
+        val side = ForegroundPick.Win(12, 3, "com.android.systemui", sw - 60, 0, sw, sh) // landscape-style bar
+        assertTrue(pick(status, nav, side, main)!!.occluders.isEmpty())
+    }
+
+    @Test fun otherAppOnTopHidesUs() {
+        val launcher = ForegroundPick.Win(3, 1, "com.bbk.launcher2", 0, 0, sw, sh)
+        assertEquals(null, pick(launcher, main))
+        assertEquals(null, pick(launcher))
+    }
+
+    @Test fun shoppingAppInASmallWindowIsNotPicked() {
+        val small = ForegroundPick.Win(4, 1, pddPkg, 0, 0, 800, 1000)
+        assertEquals(null, pick(small))
+    }
+
+    @Test fun runStopsAtAnotherAppsWindow() {
+        val sheet = ForegroundPick.Win(14, 1, pddPkg, 0, 1400, sw, sh)
+        val launcher = ForegroundPick.Win(3, 1, "com.bbk.launcher2", 0, 0, sw, sh)
+        assertEquals(null, pick(sheet, launcher, main))
+    }
+
+    @Test fun windowWithoutRootIsSkipped() {
+        val loading = ForegroundPick.Win(15, 1, null, 0, 0, sw, sh)
+        assertEquals(1, pick(loading, main)!!.windowId)
+    }
+
+    @Test fun coverRectOfUpperWindows() {
+        val sheet = ForegroundPick.Win(14, 1, pddPkg, 0, 1400, sw, sh)
+        assertTrue(ForegroundPick.coverRect(sheet, emptyList(), sw, sh)!!.contentEquals(intArrayOf(0, 1400, sw, sh)))
+        val host = ForegroundPick.Win(7, 1, pddPkg, 0, 0, sw, sh)
+        assertEquals(null, ForegroundPick.coverRect(host, emptyList(), sw, sh))
+        val text = listOf(intArrayOf(800, 900, 1000, 960), intArrayOf(820, 980, 1040, 1030))
+        assertTrue(ForegroundPick.coverRect(host, text, sw, sh)!!.contentEquals(intArrayOf(800, 900, 1040, 1030)))
+    }
+
+    @Test fun occludedIsStrictIntersection() {
         assertTrue(ForegroundPick.occluded(0, 0, 10, 10, listOf(intArrayOf(5, 5, 15, 15))))
         assertFalse(ForegroundPick.occluded(0, 0, 10, 10, listOf(intArrayOf(10, 0, 20, 10))))
         assertFalse(ForegroundPick.occluded(0, 0, 10, 10, emptyList()))
