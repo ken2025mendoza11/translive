@@ -254,16 +254,25 @@ class OverlayController(base: Context) : EdgeHost {
         this.images = images
         this.showOriginal = original
         edge.invalidate()
+        render()
     }
 
     private val items = LinkedHashMap<String, Patch>()
     private val missing = HashMap<String, Int>()
+    private val suppressed = HashSet<String>()
     private var edgeSig = ""
     private var nextId = 1
+    private var live = false
 
     fun attached() = overlayAdded || edgeAdded
 
+    fun setLive(on: Boolean) {
+        live = on
+        if (overlayAdded) render()
+    }
+
     fun attach() {
+        live = true
         if (!overlayAdded) {
             wm.addView(overlay, overlayParams())
             overlayAdded = true
@@ -272,32 +281,39 @@ class OverlayController(base: Context) : EdgeHost {
         render()
     }
 
-    fun matchKey(source: Int, zh: String, viewId: String, bounds: Rect): String {
-        val base = "$source|$zh|$viewId"
-        var best: String? = null
-        var bestD = Long.MAX_VALUE
-        val limit = context.resources.displayMetrics.heightPixels * 0.55f
-        for ((key, patch) in items) {
-            if (!key.startsWith("$base|")) continue
-            val dx = (patch.bounds.centerX() - bounds.centerX()).toLong()
-            val dy = (patch.bounds.centerY() - bounds.centerY()).toLong()
-            val d = dx * dx + dy * dy
-            if (d < bestD) {
-                bestD = d
-                best = key
-            }
-        }
-        if (best != null && bestD <= limit * limit) return best
-        return "$base|${nextId++}"
-    }
+    fun mint(source: Int, zh: String, viewId: String) = "$source|$zh|$viewId|${nextId++}"
+
+    fun tracks(source: Int): List<Patch> = items.values.filter { it.source == source }
 
     fun peek(key: String): Patch? = items[key]
 
-    fun drawn(): List<Patch> = items.values.filter { Color.alpha(it.bg) != 0 }
+    fun drawn(): List<Patch> = items.values.filter { Color.alpha(it.bg) != 0 && it.key !in suppressed }
+
+    fun shift(container: Rect, dx: Int, dy: Int) {
+        val screen = screen()
+        val moveAll = container.isEmpty
+        for ((key, patch) in items) {
+            if (!moveAll && !inside(container, patch.bounds)) continue
+            val moved = Rect(patch.bounds)
+            moved.offset(dx, dy)
+            items[key] = patch.copy(bounds = moved)
+            if (!Rect.intersects(moved, screen)) suppressed.add(key) else suppressed.remove(key)
+        }
+        render()
+    }
+
+    fun concealInside(container: Rect) {
+        val moveAll = container.isEmpty
+        for ((key, patch) in items) {
+            if (moveAll || inside(container, patch.bounds)) suppressed.add(key)
+        }
+        render()
+    }
 
     /** Merge one source. Missing keys of that source are dropped only after two passes. */
-    fun upsert(source: Int, next: List<Patch>, dropMissing: Boolean) {
+    fun upsert(source: Int, next: List<Patch>, dropMissing: Boolean, hideUnmatched: Boolean = false) {
         val seen = HashSet<String>()
+        val screen = screen()
         for (patch in next) {
             seen.add(patch.key)
             val old = items[patch.key]
@@ -307,14 +323,18 @@ class OverlayController(base: Context) : EdgeHost {
                 patch
             }
             missing.remove(patch.key)
+            suppressed.remove(patch.key)
+            if (!Rect.intersects(patch.bounds, screen)) suppressed.add(patch.key)
         }
+        val unmatched = items.filter { it.value.source == source && it.key !in seen }.keys.toList()
+        if (hideUnmatched) unmatched.forEach { suppressed.add(it) }
         if (dropMissing) {
-            val gone = items.filter { it.value.source == source && it.key !in seen }.keys.toList()
-            for (key in gone) {
+            for (key in unmatched) {
                 val count = (missing[key] ?: 0) + 1
                 if (count >= 2) {
                     items.remove(key)
                     missing.remove(key)
+                    suppressed.remove(key)
                 } else {
                     missing[key] = count
                 }
@@ -335,14 +355,11 @@ class OverlayController(base: Context) : EdgeHost {
     }
 
     private fun render() {
-        val visible = if (paused || showOriginal) emptyList() else keepTight(items.values.toList())
+        if (!overlayAdded) return
+        val visible = if (!live || paused || showOriginal) emptyList() else keepTight(items.values.filter { it.key !in suppressed })
         overlay.alpha = 1f
         overlay.setPatches(visible)
-        if (!overlayAdded) {
-            wm.addView(overlay, overlayParams())
-            overlayAdded = true
-        }
-        ensureEdge(force = false)
+        if (edgeAdded) ensureEdge(force = false)
     }
 
     private fun keepTight(patches: List<Patch>): List<Patch> {
@@ -376,6 +393,7 @@ class OverlayController(base: Context) : EdgeHost {
     }
 
     fun hide() {
+        live = false
         if (overlayAdded) {
             wm.removeView(overlay)
             overlayAdded = false
@@ -385,6 +403,12 @@ class OverlayController(base: Context) : EdgeHost {
             edgeAdded = false
             edgeSig = ""
         }
+    }
+
+    private fun screen() = Rect(0, 0, context.resources.displayMetrics.widthPixels, context.resources.displayMetrics.heightPixels)
+
+    private fun inside(container: Rect, bounds: Rect): Boolean {
+        return container.contains(bounds.centerX(), bounds.centerY()) || Rect.intersects(container, bounds)
     }
 
     private fun ensureEdge(force: Boolean) {

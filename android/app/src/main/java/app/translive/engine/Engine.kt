@@ -253,6 +253,12 @@ object Chrome {
         return false
     }
 
+    /** English output only. "Back in stock" and "Share to get" stay. */
+    fun skipEnglish(en: String): Boolean {
+        val t = normalized(en).lowercase()
+        return t == "back" || t == "share" || t == "navigate up"
+    }
+
     fun skipViewId(id: String?): Boolean {
         if (id.isNullOrBlank()) return false
         val leaf = id.substringAfterLast('/').lowercase()
@@ -276,6 +282,44 @@ object Chrome {
         if (widthDp > 56f || heightDp > 56f || topDp > 120f) return false
         val cls = className.lowercase()
         return cls.contains("image") || cls.contains("button") || cls.endsWith(".view") || cls == "android.view.view"
+    }
+}
+
+object KeyMatch {
+    data class Node(val id: Int, val text: String, val viewId: String, val top: Int, val left: Int, val height: Int)
+    data class Item(val key: String, val text: String, val viewId: String, val top: Int, val left: Int, val height: Int)
+
+    /** Each existing key is given to at most one node. Nearest pair wins. */
+    fun assign(nodes: List<Node>, existing: List<Item>, scrollDy: Int): Map<Int, String> {
+        val pairs = ArrayList<Triple<Long, Int, String>>()
+        for (node in nodes) {
+            for (item in existing) {
+                if (item.text != node.text || item.viewId != node.viewId) continue
+                val dx = item.left - node.left
+                val dy = item.top + scrollDy - node.top
+                val dist = dx.toLong() * dx + dy.toLong() * dy
+                val radius = (1.5f * maxOf(node.height, item.height)).toInt().coerceAtLeast(8) + kotlin.math.abs(scrollDy)
+                if (dist <= radius.toLong() * radius) pairs.add(Triple(dist, node.id, item.key))
+            }
+        }
+        pairs.sortBy { it.first }
+        val usedNodes = HashSet<Int>()
+        val usedKeys = HashSet<String>()
+        val out = HashMap<Int, String>()
+        for ((_, id, key) in pairs) {
+            if (id in usedNodes || key in usedKeys) continue
+            usedNodes.add(id)
+            usedKeys.add(key)
+            out[id] = key
+        }
+        return out
+    }
+}
+
+object ReleaseVersion {
+    fun read(gradle: String): String {
+        val name = Regex("""versionName\s*=\s*"([^"]+)"""").find(gradle)?.groupValues?.get(1).orEmpty()
+        return name
     }
 }
 

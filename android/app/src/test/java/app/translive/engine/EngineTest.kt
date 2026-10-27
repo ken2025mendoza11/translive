@@ -117,5 +117,38 @@ class ChromeTest {
         assertTrue(Chrome.smallTitleIcon(true, 40f, 40f, 24f, "android.widget.ImageButton", true))
         assertFalse(Chrome.smallTitleIcon(true, 40f, 40f, 24f, "android.widget.ImageButton", false))
         assertFalse(Chrome.smallTitleIcon(true, 200f, 48f, 80f, "android.widget.TextView", true))
+        assertTrue(Chrome.skipEnglish("Back"))
+        assertTrue(Chrome.skipEnglish("Share"))
+        assertTrue(Chrome.skipEnglish("Navigate up"))
+        assertFalse(Chrome.skipEnglish("Back in stock"))
+        assertFalse(Chrome.skipEnglish("Share to get ¥5"))
+    }
+}
+
+class KeyMatchTest {
+    @Test fun identicalLabelsKeepDistinctKeys() {
+        val existing = listOf(
+            KeyMatch.Item("0|立即领取||1", "立即领取", "", 100, 10, 40),
+            KeyMatch.Item("0|立即领取||2", "立即领取", "", 200, 10, 40),
+            KeyMatch.Item("0|立即领取||3", "立即领取", "", 300, 10, 40),
+        )
+        val nodes = listOf(
+            KeyMatch.Node(0, "立即领取", "", 180, 10, 40),
+            KeyMatch.Node(1, "立即领取", "", 280, 10, 40),
+            KeyMatch.Node(2, "立即领取", "", 380, 10, 40),
+        )
+        val assigned = KeyMatch.assign(nodes, existing, 80)
+        assertEquals(3, assigned.values.toSet().size)
+        assertEquals("0|立即领取||1", assigned[0])
+        assertEquals("0|立即领取||2", assigned[1])
+        assertEquals("0|立即领取||3", assigned[2])
+    }
+}
+
+class ReleaseVersionTest {
+    @Test fun readsVersionName() {
+        val gradle = "        versionCode = 7\n        versionName = \"1.4.2\"\n"
+        assertEquals("1.4.2", ReleaseVersion.read(gradle))
+        assertEquals("", ReleaseVersion.read("versionName = \"\""))
     }
 }
