@@ -7,6 +7,7 @@ import android.graphics.Paint
 import android.graphics.PixelFormat
 import android.graphics.Rect
 import android.os.Build
+import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.view.ContextThemeWrapper
 import android.view.Gravity
@@ -20,7 +21,10 @@ data class Patch(val text: String, val bounds: Rect, val bg: Int, val fg: Int)
 
 class OverlayView(context: Context) : View(context) {
     private val bgPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { isFakeBoldText = true }
+    private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
+        isFakeBoldText = false
+    }
     private var patches: List<Patch> = emptyList()
 
     init {
@@ -42,30 +46,35 @@ class OverlayView(context: Context) : View(context) {
         for (patch in patches) {
             bgPaint.color = patch.bg or 0xFF000000.toInt()
             val r = patch.bounds
-            canvas.drawRoundRect(r.left.toFloat(), r.top.toFloat(), r.right.toFloat(), r.bottom.toFloat(), 8f, 8f, bgPaint)
-            val width = (r.width() - 8f).coerceAtLeast(4f)
+            canvas.drawRect(r.left.toFloat(), r.top.toFloat(), r.right.toFloat(), r.bottom.toFloat(), bgPaint)
+            val width = (r.width() - 2f).coerceAtLeast(4f)
             val height = r.height().toFloat().coerceAtLeast(4f)
-            val laid = layout(patch.text, width, height)
+            val maxLines = if (height > 34f * resources.displayMetrics.density) 2 else 1
+            val laid = layout(patch.text, width, height, maxLines)
             textPaint.color = patch.fg
             textPaint.textSize = laid.first
-            val block = laid.second.size * laid.first * 1.12f
-            var y = r.top + ((height - block) / 2f).coerceAtLeast(0f) + laid.first
+            val block = laid.second.size * laid.first * 1.05f
+            var y = r.top + ((height - block) / 2f).coerceAtLeast(0f) - textPaint.ascent()
+            val center = patch.text.length <= 14 && r.width() < 220f * resources.displayMetrics.density && r.width() < r.height() * 6
+            textPaint.textAlign = if (center) Paint.Align.CENTER else Paint.Align.LEFT
             for (line in laid.second) {
                 if (y > r.bottom + 2) break
-                canvas.drawText(line, r.left + 4f, y, textPaint)
-                y += laid.first * 1.12f
+                val x = if (center) r.exactCenterX() else r.left + 1f
+                canvas.drawText(line, x, y, textPaint)
+                y += laid.first * 1.05f
             }
+            textPaint.textAlign = Paint.Align.LEFT
         }
     }
 
-    private fun layout(text: String, width: Float, height: Float): Pair<Float, List<String>> {
-        var size = (height * 0.72f).coerceIn(11f, 36f)
+    private fun layout(text: String, width: Float, height: Float, maxLines: Int): Pair<Float, List<String>> {
+        var size = (height * if (maxLines == 1) 0.78f else 0.46f).coerceIn(11f, 40f)
         textPaint.textSize = size
-        var lines = wrap(text, width, 3)
-        while (size > 11f && (lines.size * size * 1.12f > height || lines.any { textPaint.measureText(it) > width })) {
-            size -= 1f
+        var lines = wrap(text, width, maxLines)
+        while (size > 10f && (lines.size * size * 1.05f > height || lines.any { textPaint.measureText(it) > width })) {
+            size -= 0.5f
             textPaint.textSize = size
-            lines = wrap(text, width, 3)
+            lines = wrap(text, width, maxLines)
         }
         return size to lines
     }
@@ -204,6 +213,14 @@ class OverlayController(base: Context) : EdgeHost {
 
     private var current = emptyList<Patch>()
 
+    fun conceal() {
+        if (overlayAdded) overlay.alpha = 0f
+    }
+
+    fun reveal() {
+        if (overlayAdded) overlay.alpha = 1f
+    }
+
     fun showPatches(patches: List<Patch>) {
         current = patches
         render()
@@ -236,7 +253,7 @@ class OverlayController(base: Context) : EdgeHost {
             if (patch.text.isBlank()) continue
             val w = patch.bounds.width()
             val h = patch.bounds.height()
-            if (w < 2 || h < 2 || h > 420 || w * h > 700_000) continue
+            if (w < 2 || h < 2 || h > 190 || w * h > 220_000) continue
             if (kept.any { overlap(it.bounds, patch.bounds) > 0.4f }) continue
             kept.add(patch)
         }

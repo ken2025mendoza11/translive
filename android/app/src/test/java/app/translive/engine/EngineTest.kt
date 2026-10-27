@@ -22,6 +22,8 @@ class TemplateEngineTest {
         assertEquals("¥3.9", TemplateEngine.apply("¥3.9"))
         assertEquals("Subsidy ¥10.46", TemplateEngine.apply("补贴10.46元"))
         assertEquals("184K sold", TemplateEngine.apply("已售18.4万件"))
+        assertEquals("¥30 off each ¥200", TemplateEngine.apply("每满200减30"))
+        assertEquals("Add", app.translive.engine.UiCopy.phrase("立即加购"))
         assertTrue(TemplateEngine.apply("券后¥15.54")!!.startsWith("After coupon"))
     }
 }

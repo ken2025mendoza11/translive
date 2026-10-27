@@ -47,6 +47,10 @@ object TemplateEngine {
         Regex("已抢\\s*(\\d+(?:\\.\\d+)?)\\s*万\\+?\\s*件?") to { m -> "${wanToK(m.groupValues[1])} sold" },
         Regex("已拼\\s*(\\d+(?:\\.\\d+)?)\\s*万\\+?\\s*件?") to { m -> "${wanToK(m.groupValues[1])} sold" },
         Regex("补贴\\s*(\\d+(?:\\.\\d+)?)\\s*元") to { m -> "Subsidy ¥${m.groupValues[1]}" },
+        Regex("每满\\s*(\\d+(?:\\.\\d+)?)\\s*减\\s*(\\d+(?:\\.\\d+)?)") to { m -> "¥${m.groupValues[2]} off each ¥${m.groupValues[1]}" },
+        Regex("满\\s*(\\d+(?:\\.\\d+)?)\\s*减(?!\\d)") to { m -> "Over ¥${m.groupValues[1]}" },
+        Regex("[¥￥]\\s*(\\d+(?:\\.\\d+)?)\\s*起") to { m -> "From ¥${m.groupValues[1]}" },
+        Regex("(\\d+(?:\\.\\d+)?)\\s*起") to { m -> "From ¥${m.groupValues[1]}" },
         Regex("券后价?") to { _ -> "After coupon " },
         Regex("官方正品") to { _ -> "Official" },
         Regex("正品险") to { _ -> "Genuine" },
@@ -135,6 +139,8 @@ object LookupChain {
         fun finish(en: String, layer: Layer) = Hit(zh, CurrencyFormat.apply(Units.apply(zh, en), currency), layer, upload, pii)
 
         glossary[zh]?.let { return finish(it, Layer.GLOSSARY) }
+        if (UiCopy.skip(zh)) return finish(zh, Layer.NONE)
+        UiCopy.phrase(zh)?.let { return finish(it, Layer.DICTIONARY) }
         dictionary[zh]?.let { return finish(it, Layer.DICTIONARY) }
         TemplateEngine.apply(zh)?.let { return finish(it, Layer.TEMPLATE) }
         stitch(zh, dictionary)?.let { return finish(it, Layer.DICTIONARY) }
@@ -185,6 +191,54 @@ object LookupChain {
     }
 }
 
+object UiCopy {
+    private val exact = mapOf(
+        "立即加购" to "Add",
+        "加入购物车" to "Add to cart",
+        "加购" to "Add",
+        "品牌秒杀" to "Brand flash sale",
+        "限时秒杀" to "Flash sale",
+        "整点抢券" to "Timed coupons",
+        "点我夺宝" to "Prize draw",
+        "砸金蛋" to "Golden egg",
+        "三单挑战" to "3-order challenge",
+        "跨店满减" to "Multi-store",
+        "百亿补贴" to "Subsidized",
+        "万人团" to "Group buy",
+        "券后" to "After coupon",
+        "券后价" to "After coupon",
+        "去结算" to "Checkout",
+        "官方正品" to "Official",
+        "正品险" to "Genuine",
+        "全场每满200减30" to "¥30 off every ¥200",
+        "查看物流" to "Track",
+        "确认收货" to "Received",
+        "退款" to "Refund",
+    )
+
+    fun phrase(zh: String): String? = exact[zh.trim()]
+
+    fun skip(zh: String): Boolean {
+        val t = zh.trim()
+        return t in setOf("返回", "后退", "分享", "关闭", "取消", "搜索")
+    }
+
+    fun hideEnglish(en: String): Boolean {
+        val t = en.trim().lowercase()
+        return t == "back" || t == "share" || t == "close" || t == "search"
+    }
+
+    fun polish(en: String): String {
+        var s = en
+        s = s.replace(Regex("(?i)have (a |to )?grab"), "Sold")
+        s = s.replace(Regex("(?i)\\bsubsidize\\b"), "Subsidy")
+        s = s.replace(Regex("(?i)brand\\s*after coupon"), "After coupon")
+        s = s.replace(Regex("(?i)^product name:\\s*"), "")
+        s = s.replace(Regex("(?i)\\s*yuan\\b"), "")
+        return s.replace(Regex("\\s+"), " ").trim()
+    }
+}
+
 object TextClean {
     fun present(en: String): String? {
         val cjk = en.count { it.code in 0x4E00..0x9FFF }
@@ -200,7 +254,7 @@ object TextClean {
         for (word in words) {
             if (kept.isEmpty() || !kept.last().equals(word, ignoreCase = true)) kept.add(word)
         }
-        val tidy = kept.joinToString(" ")
+        val tidy = UiCopy.polish(kept.joinToString(" "))
         if (!tidy.any { it.isLetter() }) return null
         return tidy
     }

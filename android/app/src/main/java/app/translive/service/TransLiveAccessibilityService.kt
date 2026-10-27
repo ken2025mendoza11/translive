@@ -18,6 +18,7 @@ import app.translive.engine.ExcludedScreens
 import app.translive.engine.Layer
 import app.translive.engine.LookupChain
 import app.translive.engine.TextClean
+import app.translive.engine.UiCopy
 import app.translive.overlay.OverlayController
 import app.translive.overlay.Patch
 import com.google.mlkit.common.model.DownloadConditions
@@ -102,18 +103,19 @@ class TransLiveAccessibilityService : AccessibilityService() {
         val patches = ArrayList<Patch>()
         val misses = ArrayList<Found>()
         for (node in nodes) {
+            if (UiCopy.skip(node.text) || inStatusBar(node.bounds)) continue
             val cached = cache.get(node.text)?.let { TextClean.present(it) }
             val hit = LookupChain.translate(
                 node.text,
                 prefs.glossary(),
                 dict,
                 if (cached != null) mapOf(node.text to cached) else emptyMap(),
-                prefs.currency(),
+                "NONE",
                 blocked || PiiScreen(node.text),
             )
             val en = if (hit.layer == Layer.NONE) null else TextClean.present(hit.en)
-            if (en == null) misses.add(node)
-            else {
+            if (en == null || UiCopy.hideEnglish(en)) misses.add(node)
+            else if (latestBitmap != null) {
                 lastReported = node.text
                 val (bg, fg) = colors(node.bounds)
                 patches.add(Patch(en, node.bounds, bg, fg))
@@ -132,6 +134,7 @@ class TransLiveAccessibilityService : AccessibilityService() {
                 .addOnSuccessListener { raw ->
                     if (ticket != pass) return@addOnSuccessListener
                     val en = TextClean.present(raw) ?: return@addOnSuccessListener
+                    if (UiCopy.hideEnglish(en) || UiCopy.skip(node.text)) return@addOnSuccessListener
                     cache.put(node.text, en)
                     if (!blocked && prefs.contribute() && !app.translive.engine.PiiFilter.hasPii(node.text)) {
                         // Shared library upload waits for a proxy URL. Nothing leaves the phone until then.
@@ -144,63 +147,83 @@ class TransLiveAccessibilityService : AccessibilityService() {
 
     private fun maybeOcr(painted: List<Rect>) {
         if (!prefs.ocr() || prefs.paused() || Build.VERSION.SDK_INT < 30) return
-        if (eventTimes.size > 8) return
+        if (eventTimes.size > 24) return
         if (prefs.dataSaver() && metered()) return
         if (batteryLow()) return
         val now = android.os.SystemClock.uptimeMillis()
-        if (now - lastOcr < 1600) return
+        if (now - lastOcr < 1200) return
         lastOcr = now
         val ticket = pass
-        takeScreenshot(Display.DEFAULT_DISPLAY, mainExecutor, object : TakeScreenshotCallback {
-            override fun onSuccess(result: ScreenshotResult) {
-                val hardware = Bitmap.wrapHardwareBuffer(result.hardwareBuffer, result.colorSpace)
-                result.hardwareBuffer.close()
-                if (hardware == null) return
-                val bitmap = hardware.copy(Bitmap.Config.ARGB_8888, false)
-                hardware.recycle()
-                val firstShot = latestBitmap == null
-                latestBitmap = bitmap
-                if (firstShot) {
-                    lastKey = ""
-                    schedule()
-                }
-                val image = InputImage.fromBitmap(bitmap, 0)
-                recognizer.process(image).addOnSuccessListener { vision ->
-                    if (ticket != pass && !firstShot) return@addOnSuccessListener
-                    val extra = ArrayList<Patch>()
-                    val ocrMisses = ArrayList<Found>()
-                    for (block in vision.textBlocks) {
-                        for (line in block.lines) {
-                            val zh = line.text.trim()
-                            if (zh.count { it.code in 0x4E00..0x9FFF } < 2) continue
-                            val box = line.boundingBox ?: continue
-                            if (box.width() < 8 || box.height() < 8 || box.height() > 260) continue
-                            if (covered(box, painted)) continue
-                            val cached = cache.get(zh)?.let { TextClean.present(it) }
-                            val hit = LookupChain.translate(
-                                zh,
-                                prefs.glossary(),
-                                dict,
-                                if (cached != null) mapOf(zh to cached) else emptyMap(),
-                                prefs.currency(),
-                                false,
-                            )
-                            val en = if (hit.layer == Layer.NONE) null else TextClean.present(hit.en)
-                            if (en == null) {
-                                if (ocrMisses.size < 12) ocrMisses.add(Found(zh, Rect(box)))
-                            } else {
-                                val (bg, fg) = colors(box)
-                                extra.add(Patch(en, Rect(box), bg, fg))
+        overlay.conceal()
+        handler.postDelayed({
+            if (Build.VERSION.SDK_INT < 30) {
+                overlay.reveal()
+                return@postDelayed
+            }
+            takeScreenshot(Display.DEFAULT_DISPLAY, mainExecutor, object : TakeScreenshotCallback {
+                override fun onSuccess(result: ScreenshotResult) {
+                    overlay.reveal()
+                    val hardware = Bitmap.wrapHardwareBuffer(result.hardwareBuffer, result.colorSpace)
+                    result.hardwareBuffer.close()
+                    if (hardware == null) return
+                    val bitmap = hardware.copy(Bitmap.Config.ARGB_8888, false)
+                    hardware.recycle()
+                    val firstShot = latestBitmap == null
+                    latestBitmap = bitmap
+                    if (firstShot) {
+                        lastKey = ""
+                        schedule()
+                    }
+                    val image = InputImage.fromBitmap(bitmap, 0)
+                    recognizer.process(image).addOnSuccessListener { vision ->
+                        if (ticket != pass && !firstShot) return@addOnSuccessListener
+                        val extra = ArrayList<Patch>()
+                        val ocrMisses = ArrayList<Found>()
+                        for (block in vision.textBlocks) {
+                            for (line in block.lines) {
+                                val zh = line.text.trim()
+                                if (zh.count { it.code in 0x4E00..0x9FFF } < 2) continue
+                                if (UiCopy.skip(zh)) continue
+                                val box = toScreen(line.boundingBox ?: continue, bitmap)
+                                if (box.width() < 8 || box.height() < 8 || box.height() > 140) continue
+                                if (inStatusBar(box)) continue
+                                if (covered(box, painted)) continue
+                                val cached = cache.get(zh)?.let { TextClean.present(it) }
+                                val hit = LookupChain.translate(
+                                    zh,
+                                    prefs.glossary(),
+                                    dict,
+                                    if (cached != null) mapOf(zh to cached) else emptyMap(),
+                                    "NONE",
+                                    false,
+                                )
+                                val en = if (hit.layer == Layer.NONE) null else TextClean.present(hit.en)
+                                if (en == null || UiCopy.hideEnglish(en)) {
+                                    if (ocrMisses.size < 24) ocrMisses.add(Found(zh, Rect(box)))
+                                } else {
+                                    val (bg, fg) = colors(box)
+                                    extra.add(Patch(en, Rect(box), bg, fg))
+                                }
                             }
                         }
+                        if (extra.isNotEmpty()) overlay.addPatches(extra)
+                        if (ocrMisses.isNotEmpty()) translateLive(ocrMisses, false, ticket)
                     }
-                    if (extra.isNotEmpty()) overlay.addPatches(extra)
-                    if (ocrMisses.isNotEmpty()) translateLive(ocrMisses, false, ticket)
                 }
-            }
 
-            override fun onFailure(errorCode: Int) = Unit
-        })
+                override fun onFailure(errorCode: Int) {
+                    overlay.reveal()
+                }
+            })
+        }, 48)
+    }
+
+    private fun toScreen(box: Rect, bitmap: Bitmap): Rect {
+        val dm = resources.displayMetrics
+        if (bitmap.width == dm.widthPixels && bitmap.height == dm.heightPixels) return Rect(box)
+        val sx = dm.widthPixels.toFloat() / bitmap.width.coerceAtLeast(1)
+        val sy = dm.heightPixels.toFloat() / bitmap.height.coerceAtLeast(1)
+        return Rect((box.left * sx).toInt(), (box.top * sy).toInt(), (box.right * sx).toInt(), (box.bottom * sy).toInt())
     }
 
     private fun covered(box: Rect, painted: List<Rect>): Boolean {
@@ -218,24 +241,54 @@ class TransLiveAccessibilityService : AccessibilityService() {
 
     private fun colors(bounds: Rect): Pair<Int, Int> {
         val bitmap = latestBitmap
-        val ink = Color.parseColor("#1A1A1A")
-        if (bitmap == null) return Color.WHITE to ink
-        val samples = ArrayList<Int>(12)
-        val x0 = bounds.left.coerceIn(0, bitmap.width - 1)
-        val x1 = (bounds.right - 1).coerceIn(0, bitmap.width - 1)
-        val y0 = bounds.top.coerceIn(0, bitmap.height - 1)
-        val y1 = (bounds.bottom - 1).coerceIn(0, bitmap.height - 1)
-        for (i in 0..2) {
-            for (j in 0..2) {
-                val x = x0 + (x1 - x0) * i / 2
-                val y = y0 + (y1 - y0) * j / 2
-                samples.add(bitmap.getPixel(x, y))
+        val ink = Color.parseColor("#222222")
+        if (bitmap == null) return Color.TRANSPARENT to ink
+        val w = bitmap.width
+        val h = bitmap.height
+        if (w < 2 || h < 2) return Color.WHITE to ink
+        val left = bounds.left.coerceIn(0, w - 1)
+        val right = (bounds.right - 1).coerceIn(0, w - 1)
+        val top = bounds.top.coerceIn(0, h - 1)
+        val bottom = (bounds.bottom - 1).coerceIn(0, h - 1)
+        val around = ArrayList<Int>(16)
+        for (i in 0..5) {
+            val x = left + (right - left) * i / 5
+            around.add(bitmap.getPixel(x, (top - 3).coerceIn(0, h - 1)))
+            around.add(bitmap.getPixel(x, (bottom + 3).coerceIn(0, h - 1)))
+        }
+        val bg = around.groupingBy { it and 0x00F8F8F8.toInt() }.eachCount().maxBy { it.value }.key or 0xFF000000.toInt()
+        var fg = ink
+        var best = 0
+        val cx = (left + right) / 2
+        val cy = (top + bottom) / 2
+        for (i in 0..4) {
+            val x = left + (right - left) * i / 4
+            val y = top + (bottom - top) / 2
+            val p = bitmap.getPixel(x.coerceIn(0, w - 1), y.coerceIn(0, h - 1))
+            val dist = kotlin.math.abs(Color.red(p) - Color.red(bg)) +
+                kotlin.math.abs(Color.green(p) - Color.green(bg)) +
+                kotlin.math.abs(Color.blue(p) - Color.blue(bg))
+            if (dist > best) {
+                best = dist
+                fg = p or 0xFF000000.toInt()
             }
         }
-        val bg = samples.groupingBy { it and 0x00FCFCFC.toInt() }.eachCount().maxBy { it.value }.key or 0xFF000000.toInt()
-        val lum = (Color.red(bg) * 0.3 + Color.green(bg) * 0.59 + Color.blue(bg) * 0.11) / 255.0
-        val fg = if (lum > 0.62) ink else Color.WHITE
-        return bg to fg
+        if (best < 90) {
+            val lum = (Color.red(bg) * 0.3 + Color.green(bg) * 0.59 + Color.blue(bg) * 0.11) / 255.0
+            fg = if (lum > 0.62) ink else Color.WHITE
+        }
+        if (cx == cy) fg = fg
+        return (bg or 0xFF000000.toInt()) to fg
+    }
+
+    private fun inStatusBar(rect: Rect): Boolean {
+        val h = statusBar()
+        return rect.bottom <= h + 6
+    }
+
+    private fun statusBar(): Int {
+        val id = resources.getIdentifier("status_bar_height", "dimen", "android")
+        return if (id > 0) resources.getDimensionPixelSize(id) else (24f * resources.displayMetrics.density).toInt()
     }
 
     private fun metered(): Boolean {
@@ -267,9 +320,14 @@ class TransLiveAccessibilityService : AccessibilityService() {
         val fromText = text.any { it.code in 0x4E00..0x9FFF }
         val raw = if (fromText) text else desc
         if (!raw.any { it.code in 0x4E00..0x9FFF }) return false
-        if (!fromText && !descriptionIsLabel(node, desc)) return false
+        if (!fromText) {
+            if (desc.length > 12) return false
+            if (!descriptionIsLabel(node, desc)) return false
+        }
+        if (UiCopy.skip(raw)) return false
         val rect = Rect()
         node.getBoundsInScreen(rect)
+        if (inStatusBar(rect)) return false
         if (!boundsAreText(rect, fromText)) return false
         out.add(Found(raw, rect))
         return true
@@ -288,8 +346,9 @@ class TransLiveAccessibilityService : AccessibilityService() {
         val tall = rect.height() > dm.heightPixels * 0.34
         val wide = rect.width() > dm.widthPixels * 0.96
         if (tall && wide) return false
-        if (!fromText && rect.height() > 64f * dm.density) return false
-        if (fromText && rect.height() > dm.heightPixels * 0.22 && rect.width() > dm.widthPixels * 0.9) return false
+        if (!fromText && rect.height() > 40f * dm.density) return false
+        if (rect.height() > 56f * dm.density) return false
+        if (rect.top < statusBar() && rect.height() > 48f * dm.density) return false
         return true
     }
 
