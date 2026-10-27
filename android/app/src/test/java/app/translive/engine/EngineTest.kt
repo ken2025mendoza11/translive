@@ -59,6 +59,23 @@ class LookupChainTest {
         val blocked = LookupChain.translate("订单 13812345678", emptyMap(), dict, emptyMap(), "NONE", true)
         assertFalse(blocked.upload)
         assertTrue(blocked.pii)
+
+        val stitched = LookupChain.translate("假一赔十，极速退款", emptyMap(), mapOf("极速退款" to "Instant refund"), emptyMap(), "NONE", false)
+        assertEquals(Layer.DICTIONARY, stitched.layer)
+        assertFalse(stitched.en.any { it.code in 0x4E00..0x9FFF })
+        assertTrue(stitched.en.contains("10× if fake"))
+        assertTrue(stitched.en.contains("Instant refund"))
+
+        val partial = LookupChain.translate("强生正品", emptyMap(), emptyMap(), emptyMap(), "NONE", false)
+        assertEquals(Layer.NONE, partial.layer)
+    }
+}
+
+class TextCleanTest {
+    @Test fun dropsLeftoverChineseAndRepeatedWords() {
+        assertEquals(null, TextClean.present("# 店 店 1nd"))
+        assertEquals("Baby Milk Soap", TextClean.present("Baby Milk Milk Soap"))
+        assertEquals("Back", TextClean.present("Back"))
     }
 }
 

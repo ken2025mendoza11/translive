@@ -17,6 +17,7 @@ import app.translive.data.Prefs
 import app.translive.engine.ExcludedScreens
 import app.translive.engine.Layer
 import app.translive.engine.LookupChain
+import app.translive.engine.TextClean
 import app.translive.overlay.OverlayController
 import app.translive.overlay.Patch
 import com.google.mlkit.common.model.DownloadConditions
@@ -101,23 +102,25 @@ class TransLiveAccessibilityService : AccessibilityService() {
         val misses = ArrayList<Found>()
         for (node in nodes) {
             val cached = cache.get(node.text)
+            val usableCache = cached?.let { TextClean.present(it) }
             val hit = LookupChain.translate(
                 node.text,
                 prefs.glossary(),
                 dict,
-                if (cached != null) mapOf(node.text to cached) else emptyMap(),
+                if (usableCache != null) mapOf(node.text to usableCache) else emptyMap(),
                 prefs.currency(),
                 blocked || PiiScreen(node.text),
             )
-            if (hit.layer == Layer.NONE) misses.add(node)
+            val en = if (hit.layer == Layer.NONE) null else TextClean.present(hit.en)
+            if (en == null) misses.add(node)
             else {
                 lastReported = node.text
                 val (bg, fg) = colors(node.bounds)
-                patches.add(Patch(hit.en, node.bounds, bg, fg))
+                patches.add(Patch(en, node.bounds, bg, fg))
             }
         }
         overlay.showPatches(patches)
-        if (misses.isNotEmpty() && !prefs.paused()) translateLive(misses, blocked)
+        if (misses.isNotEmpty() && !prefs.paused()) translateLive(misses.take(16), blocked)
         maybeOcr(nodes)
     }
 
@@ -125,7 +128,8 @@ class TransLiveAccessibilityService : AccessibilityService() {
         if (batteryLow()) return
         for (node in misses) {
             translator.translate(node.text)
-                .addOnSuccessListener { en ->
+                .addOnSuccessListener { raw ->
+                    val en = TextClean.present(raw) ?: return@addOnSuccessListener
                     cache.put(node.text, en)
                     if (!blocked && prefs.contribute() && !app.translive.engine.PiiFilter.hasPii(node.text)) {
                         // Shared library upload waits for a proxy URL. Nothing leaves the phone until then.
@@ -155,16 +159,35 @@ class TransLiveAccessibilityService : AccessibilityService() {
                 val image = InputImage.fromBitmap(bitmap, 0)
                 recognizer.process(image).addOnSuccessListener { vision ->
                     val extra = ArrayList<Patch>()
+                    val ocrMisses = ArrayList<Found>()
                     for (block in vision.textBlocks) {
-                        val zh = block.text.trim()
-                        if (!zh.any { it.code in 0x4E00..0x9FFF }) continue
-                        val box = block.boundingBox ?: continue
-                        if (nodes.any { Rect.intersects(it.bounds, box) }) continue
-                        val hit = LookupChain.translate(zh, prefs.glossary(), dict, emptyMap(), prefs.currency(), false)
-                        val en = if (hit.layer == Layer.NONE) zh else hit.en
-                        extra.add(Patch(en, box, colors(box).first, colors(box).second))
+                        for (line in block.lines) {
+                            val zh = line.text.trim()
+                            val chinese = zh.count { it.code in 0x4E00..0x9FFF }
+                            if (chinese < 2) continue
+                            val box = line.boundingBox ?: continue
+                            if (box.width() < 8 || box.height() < 8 || box.height() > 160) continue
+                            if (nodes.any { Rect.intersects(it.bounds, box) }) continue
+                            val cached = cache.get(zh)?.let { TextClean.present(it) }
+                            val hit = LookupChain.translate(
+                                zh,
+                                prefs.glossary(),
+                                dict,
+                                if (cached != null) mapOf(zh to cached) else emptyMap(),
+                                prefs.currency(),
+                                false,
+                            )
+                            val en = if (hit.layer == Layer.NONE) null else TextClean.present(hit.en)
+                            if (en == null) {
+                                if (ocrMisses.size < 6) ocrMisses.add(Found(zh, Rect(box)))
+                            } else {
+                                val (bg, fg) = colors(box)
+                                extra.add(Patch(en, Rect(box), bg, fg))
+                            }
+                        }
                     }
                     if (extra.isNotEmpty()) overlay.addPatches(extra)
+                    if (ocrMisses.isNotEmpty()) translateLive(ocrMisses, false)
                 }
             }
 
@@ -195,22 +218,46 @@ class TransLiveAccessibilityService : AccessibilityService() {
         return pct in 0..15
     }
 
-    private fun walk(node: AccessibilityNodeInfo?, out: MutableList<Found>, depth: Int) {
-        if (node == null || depth > 40) return
-        val raw = node.text?.toString()?.trim().orEmpty().ifEmpty { node.contentDescription?.toString()?.trim().orEmpty() }
-        if (raw.any { it.code in 0x4E00..0x9FFF }) {
-            val rect = Rect()
-            node.getBoundsInScreen(rect)
-            if (rect.width() > 1 && rect.height() > 1) out.add(Found(raw, rect))
-        }
+    private fun walk(node: AccessibilityNodeInfo?, out: MutableList<Found>, depth: Int): Boolean {
+        if (node == null || depth > 40) return false
+        var childText = false
         for (i in 0 until node.childCount) {
             val child = node.getChild(i) ?: continue
             try {
-                walk(child, out, depth + 1)
+                if (walk(child, out, depth + 1)) childText = true
             } finally {
                 child.recycle()
             }
         }
+        if (childText) return true
+        val text = node.text?.toString()?.trim().orEmpty()
+        val desc = node.contentDescription?.toString()?.trim().orEmpty()
+        val fromText = text.any { it.code in 0x4E00..0x9FFF }
+        val raw = if (fromText) text else desc
+        if (!raw.any { it.code in 0x4E00..0x9FFF }) return false
+        if (!fromText && !descriptionIsLabel(node, desc)) return false
+        val rect = Rect()
+        node.getBoundsInScreen(rect)
+        if (!boundsAreText(rect, raw)) return false
+        out.add(Found(raw, rect))
+        return true
+    }
+
+    private fun descriptionIsLabel(node: AccessibilityNodeInfo, desc: String): Boolean {
+        val cls = node.className?.toString().orEmpty()
+        if (cls.contains("Image") || cls.contains("Texture") || cls.contains("Surface")) return false
+        if (desc == "图片" || desc == "照片" || desc == "图像") return false
+        return true
+    }
+
+    private fun boundsAreText(rect: Rect, raw: String): Boolean {
+        if (rect.width() < 2 || rect.height() < 2) return false
+        val dm = resources.displayMetrics
+        if (rect.width() > dm.widthPixels * 0.94 && rect.height() > dm.heightPixels * 0.18) return false
+        val line = 22f * dm.density
+        val lines = (raw.length / 16).coerceIn(1, 4)
+        if (rect.height() > line * (lines + 2)) return false
+        return true
     }
 
     override fun onInterrupt() {

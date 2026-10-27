@@ -108,8 +108,65 @@ object LookupChain {
         glossary[zh]?.let { return finish(it, Layer.GLOSSARY) }
         dictionary[zh]?.let { return finish(it, Layer.DICTIONARY) }
         TemplateEngine.apply(zh)?.let { return finish(it, Layer.TEMPLATE) }
+        stitch(zh, dictionary)?.let { return finish(it, Layer.DICTIONARY) }
         cache[zh]?.let { return finish(it, Layer.CACHE) }
         return finish(zh, Layer.NONE)
+    }
+
+    private val chrome = mapOf(
+        "拍照" to "Camera",
+        "拍图" to "Camera",
+        "拍视频" to "Video",
+        "第一名" to "1st place",
+        "第1名" to "1st place",
+        "第二名" to "2nd place",
+        "第三名" to "3rd place",
+        "正品保证" to "Genuine",
+        "正品保障" to "Genuine",
+        "假一赔十" to "10× if fake",
+    )
+
+    private val rank = Regex("第(\\d+)名")
+
+    /** Replace known phrases inside a longer label. Null when Chinese is still left. */
+    fun stitch(zh: String, dictionary: Map<String, String>): String? {
+        var out = rank.replace(zh) { m ->
+            when (val n = m.groupValues[1].toIntOrNull()) {
+                null -> m.value
+                1 -> "1st place"
+                2 -> "2nd place"
+                3 -> "3rd place"
+                else -> "${n}th place"
+            }
+        }
+        val book = HashMap<String, String>(dictionary.size + chrome.size)
+        book.putAll(chrome)
+        book.putAll(dictionary)
+        val keys = book.keys.filter { it.length >= 2 && out.contains(it) }.sortedByDescending { it.length }
+        for (key in keys) {
+            val en = book[key] ?: continue
+            out = out.replace(key, en)
+        }
+        out = out.replace("，", ", ").replace("、", ", ").replace(Regex("\\s+"), " ").trim()
+        if (out == zh.trim()) return null
+        if (out.any { it.code in 0x4E00..0x9FFF }) return null
+        if (!out.any { it.isLetter() }) return null
+        return out
+    }
+}
+
+object TextClean {
+    fun present(en: String): String? {
+        val words = en.trim().split(Regex("\\s+")).filter { it.isNotEmpty() }
+        if (words.isEmpty()) return null
+        val kept = ArrayList<String>(words.size)
+        for (word in words) {
+            if (kept.isEmpty() || !kept.last().equals(word, ignoreCase = true)) kept.add(word)
+        }
+        val tidy = kept.joinToString(" ")
+        if (tidy.any { it.code in 0x4E00..0x9FFF }) return null
+        if (!tidy.any { it.isLetter() }) return null
+        return tidy
     }
 }
 
