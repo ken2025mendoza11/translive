@@ -14,7 +14,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import app.translive.R
-import app.translive.engine.AutoFit
 import kotlin.math.roundToInt
 
 data class Patch(val text: String, val bounds: Rect, val bg: Int, val fg: Int)
@@ -41,22 +40,34 @@ class OverlayView(context: Context) : View(context) {
 
     override fun onDraw(canvas: Canvas) {
         for (patch in patches) {
-            bgPaint.color = patch.bg
+            bgPaint.color = patch.bg or 0xFF000000.toInt()
             val r = patch.bounds
-            canvas.drawRoundRect(r.left.toFloat(), r.top.toFloat(), r.right.toFloat(), r.bottom.toFloat(), 6f, 6f, bgPaint)
-            val base = (patch.bounds.height() * 0.62f).coerceIn(12f, 42f)
-            val fit = AutoFit.fit(patch.text, patch.bounds.width().toFloat() - 6f, base)
+            canvas.drawRoundRect(r.left.toFloat(), r.top.toFloat(), r.right.toFloat(), r.bottom.toFloat(), 8f, 8f, bgPaint)
+            val width = (r.width() - 8f).coerceAtLeast(4f)
+            val height = r.height().toFloat().coerceAtLeast(4f)
+            val laid = layout(patch.text, width, height)
             textPaint.color = patch.fg
-            textPaint.textSize = fit.fontPx
-            val lines = if (fit.lines == 1) listOf(ellipsize(patch.text, patch.bounds.width() - 6f))
-            else wrap(patch.text, patch.bounds.width() - 6f, fit.ellipsis)
-            var y = patch.bounds.top + fit.fontPx + 2f
-            for (line in lines) {
-                if (y > patch.bounds.bottom) break
-                canvas.drawText(line, patch.bounds.left + 3f, y, textPaint)
-                y += fit.fontPx * 1.15f
+            textPaint.textSize = laid.first
+            val block = laid.second.size * laid.first * 1.12f
+            var y = r.top + ((height - block) / 2f).coerceAtLeast(0f) + laid.first
+            for (line in laid.second) {
+                if (y > r.bottom + 2) break
+                canvas.drawText(line, r.left + 4f, y, textPaint)
+                y += laid.first * 1.12f
             }
         }
+    }
+
+    private fun layout(text: String, width: Float, height: Float): Pair<Float, List<String>> {
+        var size = (height * 0.72f).coerceIn(11f, 36f)
+        textPaint.textSize = size
+        var lines = wrap(text, width, 3)
+        while (size > 11f && (lines.size * size * 1.12f > height || lines.any { textPaint.measureText(it) > width })) {
+            size -= 1f
+            textPaint.textSize = size
+            lines = wrap(text, width, 3)
+        }
+        return size to lines
     }
 
     private fun ellipsize(text: String, width: Float): String {
@@ -66,7 +77,7 @@ class OverlayView(context: Context) : View(context) {
         return "$cut…"
     }
 
-    private fun wrap(text: String, width: Float, ellipsis: Boolean): List<String> {
+    private fun wrap(text: String, width: Float, maxLines: Int): List<String> {
         val words = if (text.any { it.code > 255 }) text.map { it.toString() } else text.split(" ")
         val lines = mutableListOf<String>()
         var current = ""
@@ -76,11 +87,12 @@ class OverlayView(context: Context) : View(context) {
             else {
                 if (current.isNotEmpty()) lines.add(current)
                 current = word
-                if (lines.size == 2) break
+                if (lines.size == maxLines) break
             }
         }
-        if (current.isNotEmpty() && lines.size < 2) lines.add(current)
-        if (ellipsis && lines.isNotEmpty()) lines[lines.lastIndex] = ellipsize(lines.last(), width)
+        if (current.isNotEmpty() && lines.size < maxLines) lines.add(current)
+        if (lines.isNotEmpty() && lines.size == maxLines) lines[lines.lastIndex] = ellipsize(lines.last(), width)
+        if (lines.isEmpty()) lines.add(ellipsize(text, width))
         return lines
     }
 }
@@ -224,7 +236,7 @@ class OverlayController(base: Context) : EdgeHost {
             if (patch.text.isBlank()) continue
             val w = patch.bounds.width()
             val h = patch.bounds.height()
-            if (w < 2 || h < 2 || h > 280 || w * h > 520_000) continue
+            if (w < 2 || h < 2 || h > 420 || w * h > 700_000) continue
             if (kept.any { overlap(it.bounds, patch.bounds) > 0.4f }) continue
             kept.add(patch)
         }

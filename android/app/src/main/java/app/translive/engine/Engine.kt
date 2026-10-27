@@ -42,12 +42,41 @@ object TemplateEngine {
         Regex("^(\\d+(?:\\.\\d+)?)斤$") to { m -> "${m.groupValues[1]} jin (${kg(m.groupValues[1])} kg)" },
     )
 
+    private val fragments: List<Pair<Regex, (MatchResult) -> String>> = listOf(
+        Regex("已售\\s*(\\d+(?:\\.\\d+)?)\\s*万\\+?\\s*件?") to { m -> "${wanToK(m.groupValues[1])} sold" },
+        Regex("已抢\\s*(\\d+(?:\\.\\d+)?)\\s*万\\+?\\s*件?") to { m -> "${wanToK(m.groupValues[1])} sold" },
+        Regex("已拼\\s*(\\d+(?:\\.\\d+)?)\\s*万\\+?\\s*件?") to { m -> "${wanToK(m.groupValues[1])} sold" },
+        Regex("补贴\\s*(\\d+(?:\\.\\d+)?)\\s*元") to { m -> "Subsidy ¥${m.groupValues[1]}" },
+        Regex("券后价?") to { _ -> "After coupon " },
+        Regex("官方正品") to { _ -> "Official" },
+        Regex("正品险") to { _ -> "Genuine" },
+        Regex("万人团") to { _ -> "Mega group" },
+        Regex("即将开抢") to { _ -> "Soon" },
+        Regex("(\\d+(?:\\.\\d+)?)\\s*元") to { m -> "¥${m.groupValues[1]}" },
+        Regex("减\\s*(\\d+(?:\\.\\d+)?)") to { m -> "¥${m.groupValues[1]} off" },
+    )
+
     fun apply(zh: String): String? {
         for ((regex, run) in templates) {
             val match = regex.matchEntire(zh) ?: continue
             return run(match)
         }
-        return null
+        return rewrite(zh)
+    }
+
+    /** Shopping bits inside a longer label. Null when Chinese is still left. */
+    fun rewrite(zh: String): String? {
+        val out = soften(zh)
+        if (out == zh.trim()) return null
+        if (out.any { it.code in 0x4E00..0x9FFF }) return null
+        if (!out.any { it.isLetter() }) return null
+        return out
+    }
+
+    fun soften(zh: String): String {
+        var out = zh.trim()
+        for ((regex, run) in fragments) out = regex.replace(out) { run(it) }
+        return out.replace(Regex("\\s+"), " ").trim()
     }
 
     private fun wanToK(raw: String): String {
@@ -130,7 +159,8 @@ object LookupChain {
 
     /** Replace known phrases inside a longer label. Null when Chinese is still left. */
     fun stitch(zh: String, dictionary: Map<String, String>): String? {
-        var out = rank.replace(zh) { m ->
+        var out = TemplateEngine.soften(zh)
+        out = rank.replace(out) { m ->
             when (val n = m.groupValues[1].toIntOrNull()) {
                 null -> m.value
                 1 -> "1st place"
@@ -157,14 +187,20 @@ object LookupChain {
 
 object TextClean {
     fun present(en: String): String? {
-        val words = en.trim().split(Regex("\\s+")).filter { it.isNotEmpty() }
+        val cjk = en.count { it.code in 0x4E00..0x9FFF }
+        val latin = en.count { (it in 'A'..'Z') || (it in 'a'..'z') }
+        val source = when {
+            cjk == 0 -> en
+            latin >= 8 && cjk * 4 <= latin -> en.filter { it.code !in 0x4E00..0x9FFF }
+            else -> return null
+        }
+        val words = source.trim().split(Regex("\\s+")).filter { it.isNotEmpty() }
         if (words.isEmpty()) return null
         val kept = ArrayList<String>(words.size)
         for (word in words) {
             if (kept.isEmpty() || !kept.last().equals(word, ignoreCase = true)) kept.add(word)
         }
         val tidy = kept.joinToString(" ")
-        if (tidy.any { it.code in 0x4E00..0x9FFF }) return null
         if (!tidy.any { it.isLetter() }) return null
         return tidy
     }
@@ -178,11 +214,12 @@ object AutoFit {
     }
 
     fun fit(text: String, boxPx: Float, basePx: Float): Fit {
-        val min = basePx * 0.7f
+        val min = (basePx * 0.45f).coerceAtLeast(10f)
         if (textWidth(text, basePx) <= boxPx) return Fit(basePx, 1, false)
         if (textWidth(text, min) <= boxPx) return Fit(min, 1, false)
         if (textWidth(text, min) <= boxPx * 2f) return Fit(min, 2, false)
-        return Fit(min, 2, true)
+        if (textWidth(text, min) <= boxPx * 3f) return Fit(min, 3, false)
+        return Fit(min, 3, true)
     }
 }
 

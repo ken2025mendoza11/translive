@@ -20,6 +20,9 @@ class TemplateEngineTest {
         assertEquals("From 50% off", TemplateEngine.apply("低至5折"))
         assertEquals("Next round 12:00", TemplateEngine.apply("下场12点开抢"))
         assertEquals("¥3.9", TemplateEngine.apply("¥3.9"))
+        assertEquals("Subsidy ¥10.46", TemplateEngine.apply("补贴10.46元"))
+        assertEquals("184K sold", TemplateEngine.apply("已售18.4万件"))
+        assertTrue(TemplateEngine.apply("券后¥15.54")!!.startsWith("After coupon"))
     }
 }
 
@@ -86,7 +89,8 @@ class AutoFitTest {
         assertEquals(16f, fits.fontPx)
 
         val long = AutoFit.fit("Children's Day gift set with extra wrapping", 80f, 16f)
-        assertEquals(11.2f, long.fontPx, 0.01f)
-        assertTrue(long.lines == 2)
+        assertEquals(10f, long.fontPx, 0.01f)
+        assertEquals(3, long.lines)
+        assertTrue(long.ellipsis)
     }
 }
