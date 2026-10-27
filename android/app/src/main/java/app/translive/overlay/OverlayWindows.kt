@@ -17,14 +17,26 @@ import android.view.WindowManager
 import app.translive.R
 import kotlin.math.roundToInt
 
-data class Patch(val text: String, val bounds: Rect, val bg: Int, val fg: Int)
+data class Patch(
+    val key: String,
+    val text: String,
+    val bounds: Rect,
+    val bg: Int,
+    val fg: Int,
+    val textSizePx: Float,
+    val bold: Boolean,
+    val center: Boolean,
+    val source: Int,
+) {
+    companion object {
+        const val NODE = 0
+        const val OCR = 1
+    }
+}
 
 class OverlayView(context: Context) : View(context) {
     private val bgPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
-        isFakeBoldText = false
-    }
+    private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var patches: List<Patch> = emptyList()
 
     init {
@@ -33,50 +45,83 @@ class OverlayView(context: Context) : View(context) {
     }
 
     fun setPatches(next: List<Patch>) {
+        val previous = patches
         patches = next
-        invalidate()
+        if (previous.isEmpty() && next.isEmpty()) return
+        for (patch in previous) dirty(patch.bounds)
+        for (patch in next) dirty(patch.bounds)
     }
 
-    override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
-        clearWindowBackground(this)
+    private fun dirty(r: Rect) {
+        invalidate(r.left - 4, r.top - 4, r.right + 4, r.bottom + 4)
     }
 
     override fun onDraw(canvas: Canvas) {
+        val density = resources.displayMetrics.density
         for (patch in patches) {
-            bgPaint.color = patch.bg or 0xFF000000.toInt()
+            if (Color.alpha(patch.bg) == 0) continue
             val r = patch.bounds
-            canvas.drawRect(r.left.toFloat(), r.top.toFloat(), r.right.toFloat(), r.bottom.toFloat(), bgPaint)
-            val width = (r.width() - 2f).coerceAtLeast(4f)
-            val height = r.height().toFloat().coerceAtLeast(4f)
-            val maxLines = if (height > 34f * resources.displayMetrics.density) 2 else 1
-            val laid = layout(patch.text, width, height, maxLines)
-            textPaint.color = patch.fg
+            bgPaint.color = patch.bg or 0xFF000000.toInt()
+            canvas.drawRect(
+                (r.left - 2).toFloat(),
+                (r.top - 2).toFloat(),
+                (r.right + 2).toFloat(),
+                (r.bottom + 2).toFloat(),
+                bgPaint,
+            )
+            val origin = if (patch.textSizePx > 0f) patch.textSizePx else r.height() * 0.75f
+            val min = (origin * 0.7f).coerceAtLeast(9f * density)
+            val maxLines = if (r.height() >= origin * 1.7f) 2 else 1
+            textPaint.typeface = Typeface.create("sans-serif", if (patch.bold) Typeface.BOLD else Typeface.NORMAL)
+            val laid = layout(patch.text, (r.width() - 2f).coerceAtLeast(4f), r.height().toFloat(), origin, min, maxLines)
+            textPaint.color = patch.fg or 0xFF000000.toInt()
             textPaint.textSize = laid.first
-            val block = laid.second.size * laid.first * 1.05f
-            var y = r.top + ((height - block) / 2f).coerceAtLeast(0f) - textPaint.ascent()
-            val center = patch.text.length <= 14 && r.width() < 220f * resources.displayMetrics.density && r.width() < r.height() * 6
-            textPaint.textAlign = if (center) Paint.Align.CENTER else Paint.Align.LEFT
+            val metrics = textPaint.fontMetrics
+            val lineH = metrics.descent - metrics.ascent
+            val block = laid.second.size * lineH
+            var baseline = r.top + ((r.height() - block) / 2f).coerceAtLeast(0f) - metrics.ascent
+            textPaint.textAlign = if (patch.center) Paint.Align.CENTER else Paint.Align.LEFT
             for (line in laid.second) {
-                if (y > r.bottom + 2) break
-                val x = if (center) r.exactCenterX() else r.left + 1f
-                canvas.drawText(line, x, y, textPaint)
-                y += laid.first * 1.05f
+                if (baseline - lineH > r.bottom) break
+                val x = if (patch.center) r.exactCenterX() else r.left + 1f
+                canvas.drawText(line, x, baseline, textPaint)
+                baseline += lineH
             }
             textPaint.textAlign = Paint.Align.LEFT
         }
     }
 
-    private fun layout(text: String, width: Float, height: Float, maxLines: Int): Pair<Float, List<String>> {
-        var size = (height * if (maxLines == 1) 0.78f else 0.46f).coerceIn(11f, 40f)
+    private fun layout(
+        text: String,
+        width: Float,
+        height: Float,
+        origin: Float,
+        min: Float,
+        maxLines: Int,
+    ): Pair<Float, List<String>> {
+        var size = origin.coerceAtMost(height * 0.92f).coerceAtLeast(min)
         textPaint.textSize = size
         var lines = wrap(text, width, maxLines)
-        while (size > 10f && (lines.size * size * 1.05f > height || lines.any { textPaint.measureText(it) > width })) {
+        while (size > min && overflows(lines, width, height, size)) {
             size -= 0.5f
             textPaint.textSize = size
             lines = wrap(text, width, maxLines)
         }
+        if (overflows(lines, width, height, size) && lines.isNotEmpty()) {
+            lines = lines.toMutableList().also { it[it.lastIndex] = ellipsize(it.last(), width) }
+        }
         return size to lines
+    }
+
+    private fun overflows(lines: List<String>, width: Float, height: Float, size: Float): Boolean {
+        val metrics = textPaint.fontMetrics
+        val lineH = metrics.descent - metrics.ascent
+        return lines.size * lineH > height + 1f || lines.any { textPaint.measureText(it) > width }
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        clearWindowBackground(this)
     }
 
     private fun ellipsize(text: String, width: Float): String {
@@ -211,50 +256,107 @@ class OverlayController(base: Context) : EdgeHost {
         edge.invalidate()
     }
 
-    private var current = emptyList<Patch>()
+    private val items = LinkedHashMap<String, Patch>()
+    private val missing = HashMap<String, Int>()
+    private var edgeSig = ""
+    private var nextId = 1
 
-    fun conceal() {
-        if (overlayAdded) overlay.alpha = 0f
-    }
+    fun attached() = overlayAdded || edgeAdded
 
-    fun reveal() {
-        if (overlayAdded) overlay.alpha = 1f
-    }
-
-    fun showPatches(patches: List<Patch>) {
-        current = patches
+    fun attach() {
+        if (!overlayAdded) {
+            wm.addView(overlay, overlayParams())
+            overlayAdded = true
+        }
+        ensureEdge(force = false)
         render()
     }
 
-    fun addPatches(more: List<Patch>) {
-        if (more.isEmpty()) return
-        current = current + more
+    fun matchKey(source: Int, zh: String, viewId: String, bounds: Rect): String {
+        val base = "$source|$zh|$viewId"
+        var best: String? = null
+        var bestD = Long.MAX_VALUE
+        val limit = context.resources.displayMetrics.heightPixels * 0.55f
+        for ((key, patch) in items) {
+            if (!key.startsWith("$base|")) continue
+            val dx = (patch.bounds.centerX() - bounds.centerX()).toLong()
+            val dy = (patch.bounds.centerY() - bounds.centerY()).toLong()
+            val d = dx * dx + dy * dy
+            if (d < bestD) {
+                bestD = d
+                best = key
+            }
+        }
+        if (best != null && bestD <= limit * limit) return best
+        return "$base|${nextId++}"
+    }
+
+    fun peek(key: String): Patch? = items[key]
+
+    fun drawn(): List<Patch> = items.values.filter { Color.alpha(it.bg) != 0 }
+
+    /** Merge one source. Missing keys of that source are dropped only after two passes. */
+    fun upsert(source: Int, next: List<Patch>, dropMissing: Boolean) {
+        val seen = HashSet<String>()
+        for (patch in next) {
+            seen.add(patch.key)
+            val old = items[patch.key]
+            items[patch.key] = if (old != null && Color.alpha(patch.bg) == 0 && Color.alpha(old.bg) != 0) {
+                patch.copy(bg = old.bg, fg = old.fg)
+            } else {
+                patch
+            }
+            missing.remove(patch.key)
+        }
+        if (dropMissing) {
+            val gone = items.filter { it.value.source == source && it.key !in seen }.keys.toList()
+            for (key in gone) {
+                val count = (missing[key] ?: 0) + 1
+                if (count >= 2) {
+                    items.remove(key)
+                    missing.remove(key)
+                } else {
+                    missing[key] = count
+                }
+            }
+        }
+        render()
+    }
+
+    fun put(patch: Patch) {
+        val old = items[patch.key]
+        items[patch.key] = if (old != null && Color.alpha(patch.bg) == 0 && Color.alpha(old.bg) != 0) {
+            patch.copy(bg = old.bg, fg = old.fg)
+        } else {
+            patch
+        }
+        missing.remove(patch.key)
         render()
     }
 
     private fun render() {
-        val visible = if (paused || showOriginal) emptyList() else keepTight(current)
-        if (visible.isEmpty()) {
-            hideOverlay()
-        } else {
-            overlay.setPatches(visible)
-            if (!overlayAdded) {
-                wm.addView(overlay, overlayParams())
-                overlayAdded = true
-            }
+        val visible = if (paused || showOriginal) emptyList() else keepTight(items.values.toList())
+        overlay.alpha = 1f
+        overlay.setPatches(visible)
+        if (!overlayAdded) {
+            wm.addView(overlay, overlayParams())
+            overlayAdded = true
         }
-        ensureEdge()
+        ensureEdge(force = false)
     }
 
     private fun keepTight(patches: List<Patch>): List<Patch> {
         val kept = ArrayList<Patch>()
-        val ordered = patches.sortedBy { it.bounds.width().toLong() * it.bounds.height() }
+        val ordered = patches.sortedWith(compareBy<Patch> { if (it.source == Patch.NODE) 0 else 1 }
+            .thenBy { it.bounds.width().toLong() * it.bounds.height() }
+            .thenBy { it.key })
         for (patch in ordered) {
             if (patch.text.isBlank()) continue
+            if (Color.alpha(patch.bg) == 0) continue
             val w = patch.bounds.width()
             val h = patch.bounds.height()
-            if (w < 2 || h < 2 || h > 190 || w * h > 220_000) continue
-            if (kept.any { overlap(it.bounds, patch.bounds) > 0.4f }) continue
+            if (w < 2 || h < 2 || h > 220 || w * h > 260_000) continue
+            if (kept.any { overlap(it.bounds, patch.bounds) > 0.45f }) continue
             kept.add(patch)
         }
         return kept
@@ -274,26 +376,26 @@ class OverlayController(base: Context) : EdgeHost {
     }
 
     fun hide() {
-        hideOverlay()
-        if (edgeAdded) {
-            wm.removeView(edge)
-            edgeAdded = false
-        }
-    }
-
-    private fun hideOverlay() {
         if (overlayAdded) {
             wm.removeView(overlay)
             overlayAdded = false
         }
+        if (edgeAdded) {
+            wm.removeView(edge)
+            edgeAdded = false
+            edgeSig = ""
+        }
     }
 
-    private fun ensureEdge() {
+    private fun ensureEdge(force: Boolean) {
+        val sig = "$open|$edgeY"
         if (!edgeAdded) {
             wm.addView(edge, edgeParams())
             edgeAdded = true
-        } else {
+            edgeSig = sig
+        } else if (force || sig != edgeSig) {
             wm.updateViewLayout(edge, edgeParams())
+            edgeSig = sig
         }
     }
 
@@ -330,11 +432,11 @@ class OverlayController(base: Context) : EdgeHost {
     override fun y() = edgeY
     override fun moveTo(y: Int) {
         edgeY = y
-        if (edgeAdded) wm.updateViewLayout(edge, edgeParams())
+        if (edgeAdded) ensureEdge(force = true)
     }
     override fun toggle() {
         open = !open
-        if (edgeAdded) wm.updateViewLayout(edge, edgeParams())
+        if (edgeAdded) ensureEdge(force = true)
         edge.invalidate()
     }
     override fun tapPanel(y: Float) {

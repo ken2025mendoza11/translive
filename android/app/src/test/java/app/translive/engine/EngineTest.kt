@@ -23,7 +23,7 @@ class TemplateEngineTest {
         assertEquals("Subsidy ¥10.46", TemplateEngine.apply("补贴10.46元"))
         assertEquals("184K sold", TemplateEngine.apply("已售18.4万件"))
         assertEquals("¥30 off each ¥200", TemplateEngine.apply("每满200减30"))
-        assertEquals("Add", app.translive.engine.UiCopy.phrase("立即加购"))
+        assertEquals("Add", UiCopy.phrase("立即加购"))
         assertTrue(TemplateEngine.apply("券后¥15.54")!!.startsWith("After coupon"))
     }
 }
@@ -94,5 +94,28 @@ class AutoFitTest {
         assertEquals(10f, long.fontPx, 0.01f)
         assertEquals(3, long.lines)
         assertTrue(long.ellipsis)
+    }
+}
+
+class ChromeTest {
+    @Test fun leavesBackAndShareUntouched() {
+        assertTrue(Chrome.skipText("分享"))
+        assertTrue(Chrome.skipText("分享按钮"))
+        assertTrue(Chrome.skipText("分享给好友"))
+        assertTrue(Chrome.skipText("去分享"))
+        assertTrue(Chrome.skipText("< 返回"))
+        assertTrue(Chrome.skipText("返回按钮"))
+        assertTrue(Chrome.skipText("Share"))
+        assertTrue(Chrome.skipText("Navigate up"))
+        assertFalse(Chrome.skipText("返回顶部"))
+        assertFalse(Chrome.skipText("商品分享赚钱活动"))
+        assertFalse(Chrome.skipText("搜索"))
+        assertTrue(Chrome.skipViewId("com.xunmeng.pinduoduo:id/iv_share"))
+        assertTrue(Chrome.skipViewId("com.xunmeng.pinduoduo:id/title_bar_back"))
+        assertTrue(Chrome.skipViewId("com.xunmeng.pinduoduo:id/btn_share"))
+        assertFalse(Chrome.skipViewId("com.xunmeng.pinduoduo:id/title"))
+        assertTrue(Chrome.smallTitleIcon(true, 40f, 40f, 24f, "android.widget.ImageButton", true))
+        assertFalse(Chrome.smallTitleIcon(true, 40f, 40f, 24f, "android.widget.ImageButton", false))
+        assertFalse(Chrome.smallTitleIcon(true, 200f, 48f, 80f, "android.widget.TextView", true))
     }
 }

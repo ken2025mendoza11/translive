@@ -139,7 +139,7 @@ object LookupChain {
         fun finish(en: String, layer: Layer) = Hit(zh, CurrencyFormat.apply(Units.apply(zh, en), currency), layer, upload, pii)
 
         glossary[zh]?.let { return finish(it, Layer.GLOSSARY) }
-        if (UiCopy.skip(zh)) return finish(zh, Layer.NONE)
+        if (Chrome.skipText(zh)) return finish(zh, Layer.NONE)
         UiCopy.phrase(zh)?.let { return finish(it, Layer.DICTIONARY) }
         dictionary[zh]?.let { return finish(it, Layer.DICTIONARY) }
         TemplateEngine.apply(zh)?.let { return finish(it, Layer.TEMPLATE) }
@@ -218,16 +218,6 @@ object UiCopy {
 
     fun phrase(zh: String): String? = exact[zh.trim()]
 
-    fun skip(zh: String): Boolean {
-        val t = zh.trim()
-        return t in setOf("返回", "后退", "分享", "关闭", "取消", "搜索")
-    }
-
-    fun hideEnglish(en: String): Boolean {
-        val t = en.trim().lowercase()
-        return t == "back" || t == "share" || t == "close" || t == "search"
-    }
-
     fun polish(en: String): String {
         var s = en
         s = s.replace(Regex("(?i)have (a |to )?grab"), "Sold")
@@ -236,6 +226,56 @@ object UiCopy {
         s = s.replace(Regex("(?i)^product name:\\s*"), "")
         s = s.replace(Regex("(?i)\\s*yuan\\b"), "")
         return s.replace(Regex("\\s+"), " ").trim()
+    }
+}
+
+object Chrome {
+    private val arrows = charArrayOf('<', '‹', '←', '>', '〈', '〉', '«', '»')
+
+    fun normalized(raw: String): String {
+        var t = raw.trim()
+        while (t.isNotEmpty() && (t[0] in arrows || t[0].isWhitespace())) t = t.substring(1).trimStart()
+        while (t.isNotEmpty() && (t.last() in arrows || t.last().isWhitespace())) t = t.dropLast(1).trimEnd()
+        return t
+    }
+
+    /** Back and Share chrome. "返回顶部" and long labels that only contain 分享 stay. */
+    fun skipText(raw: String): Boolean {
+        val t = normalized(raw)
+        if (t.isEmpty()) return false
+        if (t == "返回顶部" || t.startsWith("返回顶部")) return false
+        val lower = t.lowercase()
+        if (lower == "back to top" || lower.startsWith("back to top")) return false
+        if (t == "去分享") return true
+        if (t.startsWith("返回") || t.startsWith("后退") || t.startsWith("分享")) return true
+        if (lower == "back" || lower.startsWith("back ") || lower == "share" || lower.startsWith("share ")) return true
+        if (lower.startsWith("navigate up")) return true
+        return false
+    }
+
+    fun skipViewId(id: String?): Boolean {
+        if (id.isNullOrBlank()) return false
+        val leaf = id.substringAfterLast('/').lowercase()
+        val parts = leaf.split('_', '-', '.')
+        if (parts.any { it == "back" || it == "share" }) return true
+        return listOf(
+            "nav_up", "navigate_up", "ic_back", "iv_back", "iv_share",
+            "btn_share", "title_bar_back", "share_btn",
+        ).any { leaf.contains(it) }
+    }
+
+    fun smallTitleIcon(
+        clickable: Boolean,
+        widthDp: Float,
+        heightDp: Float,
+        topDp: Float,
+        className: String,
+        atEdge: Boolean,
+    ): Boolean {
+        if (!clickable || !atEdge) return false
+        if (widthDp > 56f || heightDp > 56f || topDp > 120f) return false
+        val cls = className.lowercase()
+        return cls.contains("image") || cls.contains("button") || cls.endsWith(".view") || cls == "android.view.view"
     }
 }
 
