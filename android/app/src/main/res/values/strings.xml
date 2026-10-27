@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TransLIVE</string>
+    <string name="share_label">Translate screenshot</string>
+    <string name="accessibility_description">TransLIVE reads Chinese text already visible in the shopping apps you choose and draws English on top. It does not read passwords or record what you type. It stays idle unless one of those apps is in front. Order, chat, account, payment and address screens are translated only on this phone and are never uploaded.</string>
+</resources>

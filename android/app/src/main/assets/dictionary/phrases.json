@@ -1,0 +1,3890 @@
+{
+  "version": "2026.10.27",
+  "phrases": [
+    {
+      "zh": "立即领取",
+      "en": "Claim now",
+      "context": "button"
+    },
+    {
+      "zh": "规则",
+      "en": "Rules",
+      "context": "button"
+    },
+    {
+      "zh": "先用后付",
+      "en": "Buy now, pay later",
+      "context": "label"
+    },
+    {
+      "zh": "首件立减",
+      "en": "First item off",
+      "context": "banner"
+    },
+    {
+      "zh": "已拼",
+      "en": "sold",
+      "context": "price"
+    },
+    {
+      "zh": "下场12点开抢",
+      "en": "Next round 12:00",
+      "context": "status"
+    },
+    {
+      "zh": "加入购物车",
+      "en": "Add to cart",
+      "context": "button"
+    },
+    {
+      "zh": "立即购买",
+      "en": "Buy now",
+      "context": "button"
+    },
+    {
+      "zh": "去结算",
+      "en": "Checkout",
+      "context": "button"
+    },
+    {
+      "zh": "领券",
+      "en": "Grab coupon",
+      "context": "button"
+    },
+    {
+      "zh": "优惠券",
+      "en": "Coupon",
+      "context": "label"
+    },
+    {
+      "zh": "包邮",
+      "en": "Free shipping",
+      "context": "shipping"
+    },
+    {
+      "zh": "运费险",
+      "en": "Shipping insurance",
+      "context": "shipping"
+    },
+    {
+      "zh": "7天无理由",
+      "en": "7-day returns",
+      "context": "label"
+    },
+    {
+      "zh": "正品保证",
+      "en": "Authentic guarantee",
+      "context": "label"
+    },
+    {
+      "zh": "店铺",
+      "en": "Shop",
+      "context": "nav"
+    },
+    {
+      "zh": "客服",
+      "en": "Chat",
+      "context": "nav"
+    },
+    {
+      "zh": "收藏",
+      "en": "Save",
+      "context": "button"
+    },
+    {
+      "zh": "分享",
+      "en": "Share",
+      "context": "button"
+    },
+    {
+      "zh": "搜索",
+      "en": "Search",
+      "context": "nav"
+    },
+    {
+      "zh": "首页",
+      "en": "Home",
+      "context": "nav"
+    },
+    {
+      "zh": "分类",
+      "en": "Categories",
+      "context": "nav"
+    },
+    {
+      "zh": "购物车",
+      "en": "Cart",
+      "context": "nav"
+    },
+    {
+      "zh": "我的",
+      "en": "Account",
+      "context": "nav"
+    },
+    {
+      "zh": "待付款",
+      "en": "To pay",
+      "context": "status"
+    },
+    {
+      "zh": "待发货",
+      "en": "To ship",
+      "context": "status"
+    },
+    {
+      "zh": "待收货",
+      "en": "In transit",
+      "context": "status"
+    },
+    {
+      "zh": "退款/售后",
+      "en": "Refunds",
+      "context": "label"
+    },
+    {
+      "zh": "评价",
+      "en": "Reviews",
+      "context": "label"
+    },
+    {
+      "zh": "问大家",
+      "en": "Q&A",
+      "context": "label"
+    },
+    {
+      "zh": "规格",
+      "en": "Specs",
+      "context": "label"
+    },
+    {
+      "zh": "颜色",
+      "en": "Color",
+      "context": "label"
+    },
+    {
+      "zh": "尺码",
+      "en": "Size",
+      "context": "label"
+    },
+    {
+      "zh": "库存仅剩",
+      "en": "Only a few left",
+      "context": "status"
+    },
+    {
+      "zh": "抢光了",
+      "en": "Sold out",
+      "context": "status"
+    },
+    {
+      "zh": "预售",
+      "en": "Pre-order",
+      "context": "label"
+    },
+    {
+      "zh": "秒杀",
+      "en": "Flash sale",
+      "context": "banner"
+    },
+    {
+      "zh": "限时折扣",
+      "en": "Limited-time deal",
+      "context": "banner"
+    },
+    {
+      "zh": "拼单成功",
+      "en": "Group filled",
+      "context": "status"
+    },
+    {
+      "zh": "还差1人",
+      "en": "1 more person needed",
+      "context": "status"
+    },
+    {
+      "zh": "邀请好友",
+      "en": "Invite friends",
+      "context": "button"
+    },
+    {
+      "zh": "复制链接",
+      "en": "Copy link",
+      "context": "button"
+    },
+    {
+      "zh": "查看全部",
+      "en": "See all",
+      "context": "button"
+    },
+    {
+      "zh": "更多",
+      "en": "More",
+      "context": "button"
+    },
+    {
+      "zh": "确定",
+      "en": "OK",
+      "context": "button"
+    },
+    {
+      "zh": "取消",
+      "en": "Cancel",
+      "context": "button"
+    },
+    {
+      "zh": "提交订单",
+      "en": "Place order",
+      "context": "button"
+    },
+    {
+      "zh": "立即使用",
+      "en": "Use now",
+      "context": "button"
+    },
+    {
+      "zh": "去使用",
+      "en": "Use",
+      "context": "button"
+    },
+    {
+      "zh": "已领取",
+      "en": "Claimed",
+      "context": "status"
+    },
+    {
+      "zh": "未使用",
+      "en": "Unused",
+      "context": "status"
+    },
+    {
+      "zh": "已过期",
+      "en": "Expired",
+      "context": "status"
+    },
+    {
+      "zh": "满减",
+      "en": "Spend & save",
+      "context": "label"
+    },
+    {
+      "zh": "跨店满减",
+      "en": "Cross-shop discount",
+      "context": "label"
+    },
+    {
+      "zh": "店铺券",
+      "en": "Shop coupon",
+      "context": "label"
+    },
+    {
+      "zh": "平台券",
+      "en": "Platform coupon",
+      "context": "label"
+    },
+    {
+      "zh": "新人专享",
+      "en": "New shopper offer",
+      "context": "banner"
+    },
+    {
+      "zh": "首单立减",
+      "en": "First order off",
+      "context": "banner"
+    },
+    {
+      "zh": "限购1件",
+      "en": "Limit 1",
+      "context": "label"
+    },
+    {
+      "zh": "每件限购1次",
+      "en": "Limit 1 per item",
+      "context": "label"
+    },
+    {
+      "zh": "重点抢券",
+      "en": "Featured coupon grab",
+      "context": "banner"
+    },
+    {
+      "zh": "本场10万张券",
+      "en": "100,000 coupons this round",
+      "context": "banner"
+    },
+    {
+      "zh": "低至5折",
+      "en": "From 50% off",
+      "context": "banner"
+    },
+    {
+      "zh": "断码捡漏区",
+      "en": "Clearance sizes",
+      "context": "banner"
+    },
+    {
+      "zh": "女士运动鞋",
+      "en": "Women's sneakers",
+      "context": "title"
+    },
+    {
+      "zh": "儿童节礼盒",
+      "en": "Children's Day gift set",
+      "context": "title"
+    },
+    {
+      "zh": "盲盒套装",
+      "en": "Blind box set",
+      "context": "title"
+    },
+    {
+      "zh": "黑色直筒裤",
+      "en": "Black straight-leg pants",
+      "context": "title"
+    },
+    {
+      "zh": "入会再减",
+      "en": "Extra off if you join",
+      "context": "label"
+    },
+    {
+      "zh": "小时券",
+      "en": "Hourly coupon",
+      "context": "label"
+    },
+    {
+      "zh": "即将开抢",
+      "en": "Starting soon",
+      "context": "status"
+    },
+    {
+      "zh": "正在热卖",
+      "en": "Selling fast",
+      "context": "status"
+    },
+    {
+      "zh": "已售罄",
+      "en": "Sold out",
+      "context": "status"
+    },
+    {
+      "zh": "找相似",
+      "en": "Similar",
+      "context": "button"
+    },
+    {
+      "zh": "降价通知",
+      "en": "Price-drop alert",
+      "context": "button"
+    },
+    {
+      "zh": "加入对比",
+      "en": "Compare",
+      "context": "button"
+    },
+    {
+      "zh": "品牌",
+      "en": "Brand",
+      "context": "label"
+    },
+    {
+      "zh": "发货地",
+      "en": "Ships from",
+      "context": "shipping"
+    },
+    {
+      "zh": "配送至",
+      "en": "Deliver to",
+      "context": "shipping"
+    },
+    {
+      "zh": "预计明天达",
+      "en": "Arrives tomorrow",
+      "context": "shipping"
+    },
+    {
+      "zh": "当日达",
+      "en": "Same-day",
+      "context": "shipping"
+    },
+    {
+      "zh": "次日达",
+      "en": "Next-day",
+      "context": "shipping"
+    },
+    {
+      "zh": "包邮到家",
+      "en": "Free delivery",
+      "context": "shipping"
+    },
+    {
+      "zh": "自营",
+      "en": "Official",
+      "context": "label"
+    },
+    {
+      "zh": "旗舰店",
+      "en": "Flagship store",
+      "context": "label"
+    },
+    {
+      "zh": "销量",
+      "en": "Sales",
+      "context": "label"
+    },
+    {
+      "zh": "好评率",
+      "en": "Positive rating",
+      "context": "review"
+    },
+    {
+      "zh": "回头客",
+      "en": "Repeat buyers",
+      "context": "review"
+    },
+    {
+      "zh": "买家秀",
+      "en": "Buyer photos",
+      "context": "review"
+    },
+    {
+      "zh": "详情",
+      "en": "Details",
+      "context": "label"
+    },
+    {
+      "zh": "参数",
+      "en": "Specs",
+      "context": "label"
+    },
+    {
+      "zh": "图文",
+      "en": "Image & text",
+      "context": "label"
+    },
+    {
+      "zh": "推荐",
+      "en": "Recommended",
+      "context": "label"
+    },
+    {
+      "zh": "猜你喜欢",
+      "en": "You may like",
+      "context": "label"
+    },
+    {
+      "zh": "为你推荐",
+      "en": "Picked for you",
+      "context": "label"
+    },
+    {
+      "zh": "刚刚浏览",
+      "en": "Just viewed",
+      "context": "label"
+    },
+    {
+      "zh": "足迹",
+      "en": "History",
+      "context": "label"
+    },
+    {
+      "zh": "清空",
+      "en": "Clear",
+      "context": "button"
+    },
+    {
+      "zh": "编辑",
+      "en": "Edit",
+      "context": "button"
+    },
+    {
+      "zh": "完成",
+      "en": "Done",
+      "context": "button"
+    },
+    {
+      "zh": "全选",
+      "en": "Select all",
+      "context": "button"
+    },
+    {
+      "zh": "删除",
+      "en": "Delete",
+      "context": "button"
+    },
+    {
+      "zh": "移入收藏",
+      "en": "Move to saved",
+      "context": "button"
+    },
+    {
+      "zh": "结算",
+      "en": "Checkout",
+      "context": "button"
+    },
+    {
+      "zh": "合计",
+      "en": "Total",
+      "context": "price"
+    },
+    {
+      "zh": "共减",
+      "en": "Saved",
+      "context": "price"
+    },
+    {
+      "zh": "实付",
+      "en": "Pay",
+      "context": "price"
+    },
+    {
+      "zh": "提交",
+      "en": "Submit",
+      "context": "button"
+    },
+    {
+      "zh": "去付款",
+      "en": "Pay now",
+      "context": "button"
+    },
+    {
+      "zh": "继续支付",
+      "en": "Continue to pay",
+      "context": "button"
+    },
+    {
+      "zh": "朋友代付",
+      "en": "Ask a friend to pay",
+      "context": "button"
+    },
+    {
+      "zh": "找朋友付",
+      "en": "Friend pays",
+      "context": "button"
+    },
+    {
+      "zh": "货到付款",
+      "en": "Cash on delivery",
+      "context": "label"
+    },
+    {
+      "zh": "余额",
+      "en": "Balance",
+      "context": "label"
+    },
+    {
+      "zh": "银行卡",
+      "en": "Card",
+      "context": "label"
+    },
+    {
+      "zh": "优惠",
+      "en": "Discount",
+      "context": "label"
+    },
+    {
+      "zh": "不使用优惠",
+      "en": "No coupon",
+      "context": "label"
+    },
+    {
+      "zh": "发票",
+      "en": "Invoice",
+      "context": "label"
+    },
+    {
+      "zh": "备注",
+      "en": "Note",
+      "context": "label"
+    },
+    {
+      "zh": "给卖家留言",
+      "en": "Note to seller",
+      "context": "label"
+    },
+    {
+      "zh": "匿名购买",
+      "en": "Private purchase",
+      "context": "label"
+    },
+    {
+      "zh": "号码保护",
+      "en": "Number privacy",
+      "context": "label"
+    },
+    {
+      "zh": "退货",
+      "en": "Return",
+      "context": "button"
+    },
+    {
+      "zh": "换货",
+      "en": "Exchange",
+      "context": "button"
+    },
+    {
+      "zh": "仅退款",
+      "en": "Refund only",
+      "context": "button"
+    },
+    {
+      "zh": "退货退款",
+      "en": "Return & refund",
+      "context": "button"
+    },
+    {
+      "zh": "申请售后",
+      "en": "Request after-sales",
+      "context": "button"
+    },
+    {
+      "zh": "进度",
+      "en": "Progress",
+      "context": "label"
+    },
+    {
+      "zh": "物流",
+      "en": "Tracking",
+      "context": "label"
+    },
+    {
+      "zh": "复制运单号",
+      "en": "Copy tracking no.",
+      "context": "button"
+    },
+    {
+      "zh": "已签收",
+      "en": "Delivered",
+      "context": "status"
+    },
+    {
+      "zh": "运输中",
+      "en": "In transit",
+      "context": "status"
+    },
+    {
+      "zh": "已发货",
+      "en": "Shipped",
+      "context": "status"
+    },
+    {
+      "zh": "仓库处理中",
+      "en": "Warehouse processing",
+      "context": "status"
+    },
+    {
+      "zh": "催发货",
+      "en": "Nudge shipment",
+      "context": "button"
+    },
+    {
+      "zh": "确认收货",
+      "en": "Confirm delivery",
+      "context": "button"
+    },
+    {
+      "zh": "延长收货",
+      "en": "Extend delivery window",
+      "context": "button"
+    },
+    {
+      "zh": "评价晒单",
+      "en": "Review with photos",
+      "context": "button"
+    },
+    {
+      "zh": "追加评价",
+      "en": "Add a review",
+      "context": "button"
+    },
+    {
+      "zh": "有图",
+      "en": "With photos",
+      "context": "label"
+    },
+    {
+      "zh": "追评",
+      "en": "Follow-up",
+      "context": "review"
+    },
+    {
+      "zh": "好评",
+      "en": "Positive",
+      "context": "review"
+    },
+    {
+      "zh": "中评",
+      "en": "Neutral",
+      "context": "review"
+    },
+    {
+      "zh": "差评",
+      "en": "Negative",
+      "context": "review"
+    },
+    {
+      "zh": "全部",
+      "en": "All",
+      "context": "label"
+    },
+    {
+      "zh": "销量优先",
+      "en": "Best selling",
+      "context": "label"
+    },
+    {
+      "zh": "价格",
+      "en": "Price",
+      "context": "label"
+    },
+    {
+      "zh": "价格升序",
+      "en": "Price: low to high",
+      "context": "label"
+    },
+    {
+      "zh": "价格降序",
+      "en": "Price: high to low",
+      "context": "label"
+    },
+    {
+      "zh": "筛选",
+      "en": "Filter",
+      "context": "button"
+    },
+    {
+      "zh": "综合",
+      "en": "Overall",
+      "context": "label"
+    },
+    {
+      "zh": "新品",
+      "en": "New arrivals",
+      "context": "label"
+    },
+    {
+      "zh": "品牌馆",
+      "en": "Brands",
+      "context": "nav"
+    },
+    {
+      "zh": "直播",
+      "en": "Live",
+      "context": "nav"
+    },
+    {
+      "zh": "短视频",
+      "en": "Clips",
+      "context": "nav"
+    },
+    {
+      "zh": "关注",
+      "en": "Follow",
+      "context": "button"
+    },
+    {
+      "zh": "粉丝",
+      "en": "Followers",
+      "context": "label"
+    },
+    {
+      "zh": "进店",
+      "en": "Enter shop",
+      "context": "button"
+    },
+    {
+      "zh": "全部商品",
+      "en": "All items",
+      "context": "label"
+    },
+    {
+      "zh": "店铺首页",
+      "en": "Shop home",
+      "context": "nav"
+    },
+    {
+      "zh": "领券中心",
+      "en": "Coupon center",
+      "context": "nav"
+    },
+    {
+      "zh": "签到",
+      "en": "Check in",
+      "context": "button"
+    },
+    {
+      "zh": "天天领券",
+      "en": "Daily coupons",
+      "context": "banner"
+    },
+    {
+      "zh": "省钱月卡",
+      "en": "Saver pass",
+      "context": "label"
+    },
+    {
+      "zh": "退货运费险",
+      "en": "Return shipping cover",
+      "context": "shipping"
+    },
+    {
+      "zh": "假一赔十",
+      "en": "10× if fake",
+      "context": "label"
+    },
+    {
+      "zh": "极速退款",
+      "en": "Instant refund",
+      "context": "label"
+    },
+    {
+      "zh": "上门取件",
+      "en": "Pickup",
+      "context": "shipping"
+    },
+    {
+      "zh": "自行寄回",
+      "en": "Ship it back",
+      "context": "shipping"
+    },
+    {
+      "zh": "填写单号",
+      "en": "Enter tracking no.",
+      "context": "label"
+    },
+    {
+      "zh": "上传凭证",
+      "en": "Upload proof",
+      "context": "button"
+    },
+    {
+      "zh": "提交申请",
+      "en": "Submit request",
+      "context": "button"
+    },
+    {
+      "zh": "处理中",
+      "en": "Processing",
+      "context": "status"
+    },
+    {
+      "zh": "已同意",
+      "en": "Approved",
+      "context": "status"
+    },
+    {
+      "zh": "已拒绝",
+      "en": "Denied",
+      "context": "status"
+    },
+    {
+      "zh": "钱款去向",
+      "en": "Refund destination",
+      "context": "label"
+    },
+    {
+      "zh": "原路退回",
+      "en": "Original payment method",
+      "context": "label"
+    },
+    {
+      "zh": "退回余额",
+      "en": "Back to balance",
+      "context": "label"
+    },
+    {
+      "zh": "商品金额",
+      "en": "Item price",
+      "context": "price"
+    },
+    {
+      "zh": "运费",
+      "en": "Shipping",
+      "context": "price"
+    },
+    {
+      "zh": "优惠金额",
+      "en": "Discount",
+      "context": "price"
+    },
+    {
+      "zh": "实付金额",
+      "en": "Amount paid",
+      "context": "price"
+    },
+    {
+      "zh": "订单编号",
+      "en": "Order no.",
+      "context": "label"
+    },
+    {
+      "zh": "下单时间",
+      "en": "Ordered at",
+      "context": "label"
+    },
+    {
+      "zh": "支付时间",
+      "en": "Paid at",
+      "context": "label"
+    },
+    {
+      "zh": "成交时间",
+      "en": "Purchased at",
+      "context": "label"
+    },
+    {
+      "zh": "关闭订单",
+      "en": "Cancel order",
+      "context": "button"
+    },
+    {
+      "zh": "再买一单",
+      "en": "Buy again",
+      "context": "button"
+    },
+    {
+      "zh": "相似推荐",
+      "en": "Similar picks",
+      "context": "label"
+    },
+    {
+      "zh": "降价了",
+      "en": "Price dropped",
+      "context": "status"
+    },
+    {
+      "zh": "补货提醒",
+      "en": "Restock alert",
+      "context": "button"
+    },
+    {
+      "zh": "到货通知",
+      "en": "Notify me",
+      "context": "button"
+    },
+    {
+      "zh": "缺货",
+      "en": "Out of stock",
+      "context": "status"
+    },
+    {
+      "zh": "预估到手",
+      "en": "Estimated price",
+      "context": "price"
+    },
+    {
+      "zh": "券后价",
+      "en": "After coupon",
+      "context": "price"
+    },
+    {
+      "zh": "到手价",
+      "en": "Your price",
+      "context": "price"
+    },
+    {
+      "zh": "原价",
+      "en": "Was",
+      "context": "price"
+    },
+    {
+      "zh": "现价",
+      "en": "Now",
+      "context": "price"
+    },
+    {
+      "zh": "直降",
+      "en": "Drop",
+      "context": "price"
+    },
+    {
+      "zh": "立减",
+      "en": "Instant off",
+      "context": "price"
+    },
+    {
+      "zh": "满件折",
+      "en": "Multi-item discount",
+      "context": "label"
+    },
+    {
+      "zh": "第二件半价",
+      "en": "2nd item half price",
+      "context": "banner"
+    },
+    {
+      "zh": "买一送一",
+      "en": "Buy 1 get 1",
+      "context": "banner"
+    },
+    {
+      "zh": "赠品",
+      "en": "Gift",
+      "context": "label"
+    },
+    {
+      "zh": "换购",
+      "en": "Add-on deal",
+      "context": "label"
+    },
+    {
+      "zh": "加价购",
+      "en": "Paid add-on",
+      "context": "label"
+    },
+    {
+      "zh": "组合",
+      "en": "Combo",
+      "context": "label"
+    },
+    {
+      "zh": "套装",
+      "en": "Set",
+      "context": "label"
+    },
+    {
+      "zh": "单件",
+      "en": "Single",
+      "context": "label"
+    },
+    {
+      "zh": "起",
+      "en": "From",
+      "context": "price"
+    },
+    {
+      "zh": "起售",
+      "en": "Min. order",
+      "context": "label"
+    },
+    {
+      "zh": "箱",
+      "en": "Case",
+      "context": "label"
+    },
+    {
+      "zh": "件",
+      "en": "pcs",
+      "context": "label"
+    },
+    {
+      "zh": "双",
+      "en": "pair",
+      "context": "label"
+    },
+    {
+      "zh": "条",
+      "en": "item",
+      "context": "label"
+    },
+    {
+      "zh": "瓶",
+      "en": "bottle",
+      "context": "label"
+    },
+    {
+      "zh": "袋",
+      "en": "bag",
+      "context": "label"
+    },
+    {
+      "zh": "盒",
+      "en": "box",
+      "context": "label"
+    },
+    {
+      "zh": "斤",
+      "en": "jin",
+      "context": "label"
+    },
+    {
+      "zh": "公斤",
+      "en": "kg",
+      "context": "label"
+    },
+    {
+      "zh": "克",
+      "en": "g",
+      "context": "label"
+    },
+    {
+      "zh": "毫升",
+      "en": "ml",
+      "context": "label"
+    },
+    {
+      "zh": "升",
+      "en": "L",
+      "context": "label"
+    },
+    {
+      "zh": "尺码对照",
+      "en": "Size chart",
+      "context": "label"
+    },
+    {
+      "zh": "均码",
+      "en": "One size",
+      "context": "label"
+    },
+    {
+      "zh": "偏小",
+      "en": "Runs small",
+      "context": "label"
+    },
+    {
+      "zh": "偏大",
+      "en": "Runs large",
+      "context": "label"
+    },
+    {
+      "zh": "标准",
+      "en": "Standard",
+      "context": "label"
+    },
+    {
+      "zh": "试穿报告",
+      "en": "Fit notes",
+      "context": "label"
+    },
+    {
+      "zh": "身高",
+      "en": "Height",
+      "context": "label"
+    },
+    {
+      "zh": "体重",
+      "en": "Weight",
+      "context": "label"
+    },
+    {
+      "zh": "胸围",
+      "en": "Bust",
+      "context": "label"
+    },
+    {
+      "zh": "腰围",
+      "en": "Waist",
+      "context": "label"
+    },
+    {
+      "zh": "臀围",
+      "en": "Hip",
+      "context": "label"
+    },
+    {
+      "zh": "肩宽",
+      "en": "Shoulder",
+      "context": "label"
+    },
+    {
+      "zh": "衣长",
+      "en": "Length",
+      "context": "label"
+    },
+    {
+      "zh": "颜色分类",
+      "en": "Color",
+      "context": "label"
+    },
+    {
+      "zh": "图片仅供参考",
+      "en": "Photos for reference",
+      "context": "label"
+    },
+    {
+      "zh": "已选",
+      "en": "Selected",
+      "context": "label"
+    },
+    {
+      "zh": "请选择规格",
+      "en": "Choose options",
+      "context": "label"
+    },
+    {
+      "zh": "数量",
+      "en": "Qty",
+      "context": "label"
+    },
+    {
+      "zh": "库存",
+      "en": "Stock",
+      "context": "label"
+    },
+    {
+      "zh": "有货",
+      "en": "In stock",
+      "context": "status"
+    },
+    {
+      "zh": "加入心愿单",
+      "en": "Wishlist",
+      "context": "button"
+    },
+    {
+      "zh": "降价提醒",
+      "en": "Price alert",
+      "context": "button"
+    },
+    {
+      "zh": "分享赚",
+      "en": "Share & earn",
+      "context": "button"
+    },
+    {
+      "zh": "立即拼单",
+      "en": "Start a group",
+      "context": "button"
+    },
+    {
+      "zh": "单独购买",
+      "en": "Buy alone",
+      "context": "button"
+    },
+    {
+      "zh": "发起拼单",
+      "en": "Start group",
+      "context": "button"
+    },
+    {
+      "zh": "参与拼单",
+      "en": "Join group",
+      "context": "button"
+    },
+    {
+      "zh": "拼单即将结束",
+      "en": "Group ending soon",
+      "context": "status"
+    },
+    {
+      "zh": "人已拼",
+      "en": "people joined",
+      "context": "label"
+    },
+    {
+      "zh": "万+",
+      "en": "10k+",
+      "context": "label"
+    },
+    {
+      "zh": "月销",
+      "en": "Monthly sales",
+      "context": "label"
+    },
+    {
+      "zh": "总售",
+      "en": "Total sold",
+      "context": "label"
+    },
+    {
+      "zh": "查看全部问答",
+      "en": "All Q&A",
+      "context": "button"
+    },
+    {
+      "zh": "商家回复",
+      "en": "Seller reply",
+      "context": "label"
+    },
+    {
+      "zh": "官方",
+      "en": "Official",
+      "context": "label"
+    },
+    {
+      "zh": "自营仓",
+      "en": "Official warehouse",
+      "context": "label"
+    },
+    {
+      "zh": "送货上门",
+      "en": "Doorstep delivery",
+      "context": "shipping"
+    },
+    {
+      "zh": "快递柜",
+      "en": "Parcel locker",
+      "context": "shipping"
+    },
+    {
+      "zh": "驿站",
+      "en": "Pickup point",
+      "context": "shipping"
+    },
+    {
+      "zh": "修改地址",
+      "en": "Change address",
+      "context": "button"
+    },
+    {
+      "zh": "新增地址",
+      "en": "Add address",
+      "context": "button"
+    },
+    {
+      "zh": "默认地址",
+      "en": "Default address",
+      "context": "label"
+    },
+    {
+      "zh": "设为默认",
+      "en": "Set as default",
+      "context": "button"
+    },
+    {
+      "zh": "保存",
+      "en": "Save",
+      "context": "button"
+    },
+    {
+      "zh": "地区",
+      "en": "Region",
+      "context": "label"
+    },
+    {
+      "zh": "详细地址",
+      "en": "Street address",
+      "context": "label"
+    },
+    {
+      "zh": "收货人",
+      "en": "Recipient",
+      "context": "label"
+    },
+    {
+      "zh": "手机号",
+      "en": "Phone",
+      "context": "label"
+    },
+    {
+      "zh": "邮政编码",
+      "en": "Postcode",
+      "context": "label"
+    },
+    {
+      "zh": "定位",
+      "en": "Location",
+      "context": "label"
+    },
+    {
+      "zh": "当前定位",
+      "en": "Current location",
+      "context": "label"
+    },
+    {
+      "zh": "重新定位",
+      "en": "Relocate",
+      "context": "button"
+    },
+    {
+      "zh": "配送服务",
+      "en": "Delivery",
+      "context": "label"
+    },
+    {
+      "zh": "定时达",
+      "en": "Scheduled delivery",
+      "context": "shipping"
+    },
+    {
+      "zh": "加急",
+      "en": "Rush",
+      "context": "shipping"
+    },
+    {
+      "zh": "普通",
+      "en": "Standard shipping",
+      "context": "shipping"
+    },
+    {
+      "zh": "运费到付",
+      "en": "Freight collect",
+      "context": "shipping"
+    },
+    {
+      "zh": "部分地区除外",
+      "en": "Some regions excluded",
+      "context": "shipping"
+    },
+    {
+      "zh": "不配送",
+      "en": "Cannot deliver",
+      "context": "status"
+    },
+    {
+      "zh": "查看物流",
+      "en": "Track parcel",
+      "context": "button"
+    },
+    {
+      "zh": "联系快递",
+      "en": "Contact courier",
+      "context": "button"
+    },
+    {
+      "zh": "签收照片",
+      "en": "Delivery photo",
+      "context": "label"
+    },
+    {
+      "zh": "已放入快递柜",
+      "en": "In a parcel locker",
+      "context": "status"
+    },
+    {
+      "zh": "取件码",
+      "en": "Pickup code",
+      "context": "label"
+    },
+    {
+      "zh": "营业时间",
+      "en": "Hours",
+      "context": "label"
+    },
+    {
+      "zh": "地图",
+      "en": "Map",
+      "context": "label"
+    },
+    {
+      "zh": "导航",
+      "en": "Navigate",
+      "context": "button"
+    },
+    {
+      "zh": "电话",
+      "en": "Phone",
+      "context": "label"
+    },
+    {
+      "zh": "在线客服",
+      "en": "Live chat",
+      "context": "button"
+    },
+    {
+      "zh": "店铺客服",
+      "en": "Shop chat",
+      "context": "button"
+    },
+    {
+      "zh": "平台客服",
+      "en": "Platform support",
+      "context": "button"
+    },
+    {
+      "zh": "服务进度",
+      "en": "Case status",
+      "context": "label"
+    },
+    {
+      "zh": "投诉",
+      "en": "Complaint",
+      "context": "button"
+    },
+    {
+      "zh": "举报",
+      "en": "Report",
+      "context": "button"
+    },
+    {
+      "zh": "我的订单",
+      "en": "My orders",
+      "context": "nav"
+    },
+    {
+      "zh": "待评价",
+      "en": "To review",
+      "context": "status"
+    },
+    {
+      "zh": "退款中",
+      "en": "Refunding",
+      "context": "status"
+    },
+    {
+      "zh": "全部订单",
+      "en": "All orders",
+      "context": "label"
+    },
+    {
+      "zh": "搜索订单",
+      "en": "Search orders",
+      "context": "label"
+    },
+    {
+      "zh": "筛选订单",
+      "en": "Filter orders",
+      "context": "label"
+    },
+    {
+      "zh": "近三个月",
+      "en": "Last 3 months",
+      "context": "label"
+    },
+    {
+      "zh": "今年",
+      "en": "This year",
+      "context": "label"
+    },
+    {
+      "zh": "红包",
+      "en": "Red packets",
+      "context": "label"
+    },
+    {
+      "zh": "现金",
+      "en": "Cash",
+      "context": "label"
+    },
+    {
+      "zh": "礼品卡",
+      "en": "Gift card",
+      "context": "label"
+    },
+    {
+      "zh": "积分",
+      "en": "Points",
+      "context": "label"
+    },
+    {
+      "zh": "会员",
+      "en": "Member",
+      "context": "label"
+    },
+    {
+      "zh": "开通会员",
+      "en": "Join membership",
+      "context": "button"
+    },
+    {
+      "zh": "会员价",
+      "en": "Member price",
+      "context": "price"
+    },
+    {
+      "zh": "等级",
+      "en": "Level",
+      "context": "label"
+    },
+    {
+      "zh": "成长值",
+      "en": "Growth",
+      "context": "label"
+    },
+    {
+      "zh": "签到领积分",
+      "en": "Check in for points",
+      "context": "button"
+    },
+    {
+      "zh": "任务中心",
+      "en": "Tasks",
+      "context": "nav"
+    },
+    {
+      "zh": "天天赚",
+      "en": "Daily rewards",
+      "context": "banner"
+    },
+    {
+      "zh": "邀请有礼",
+      "en": "Invite rewards",
+      "context": "banner"
+    },
+    {
+      "zh": "活动规则",
+      "en": "Rules",
+      "context": "label"
+    },
+    {
+      "zh": "查看规则",
+      "en": "View rules",
+      "context": "button"
+    },
+    {
+      "zh": "我知道了",
+      "en": "Got it",
+      "context": "button"
+    },
+    {
+      "zh": "不再提示",
+      "en": "Don't show again",
+      "context": "button"
+    },
+    {
+      "zh": "稍后再说",
+      "en": "Later",
+      "context": "button"
+    },
+    {
+      "zh": "立即升级",
+      "en": "Update now",
+      "context": "button"
+    },
+    {
+      "zh": "跳过",
+      "en": "Skip",
+      "context": "button"
+    },
+    {
+      "zh": "允许",
+      "en": "Allow",
+      "context": "button"
+    },
+    {
+      "zh": "去设置",
+      "en": "Open settings",
+      "context": "button"
+    },
+    {
+      "zh": "已开启",
+      "en": "On",
+      "context": "status"
+    },
+    {
+      "zh": "未开启",
+      "en": "Off",
+      "context": "status"
+    },
+    {
+      "zh": "翻译中",
+      "en": "Translating",
+      "context": "status"
+    },
+    {
+      "zh": "已暂停",
+      "en": "Paused",
+      "context": "status"
+    },
+    {
+      "zh": "网络异常",
+      "en": "Network error",
+      "context": "status"
+    },
+    {
+      "zh": "加载中",
+      "en": "Loading",
+      "context": "status"
+    },
+    {
+      "zh": "加载失败",
+      "en": "Couldn't load",
+      "context": "status"
+    },
+    {
+      "zh": "点击重试",
+      "en": "Tap to retry",
+      "context": "button"
+    },
+    {
+      "zh": "没有更多了",
+      "en": "That's everything",
+      "context": "status"
+    },
+    {
+      "zh": "下拉刷新",
+      "en": "Pull to refresh",
+      "context": "label"
+    },
+    {
+      "zh": "松开刷新",
+      "en": "Release to refresh",
+      "context": "label"
+    },
+    {
+      "zh": "正在刷新",
+      "en": "Refreshing",
+      "context": "status"
+    },
+    {
+      "zh": "空空如也",
+      "en": "Nothing here",
+      "context": "status"
+    },
+    {
+      "zh": "去逛逛",
+      "en": "Browse",
+      "context": "button"
+    },
+    {
+      "zh": "返回",
+      "en": "Back",
+      "context": "button"
+    },
+    {
+      "zh": "关闭",
+      "en": "Close",
+      "context": "button"
+    },
+    {
+      "zh": "展开",
+      "en": "Expand",
+      "context": "button"
+    },
+    {
+      "zh": "收起",
+      "en": "Collapse",
+      "context": "button"
+    },
+    {
+      "zh": "查看详情",
+      "en": "View details",
+      "context": "button"
+    },
+    {
+      "zh": "更多优惠",
+      "en": "More offers",
+      "context": "label"
+    },
+    {
+      "zh": "领券购买",
+      "en": "Buy with coupon",
+      "context": "button"
+    },
+    {
+      "zh": "可用",
+      "en": "Available",
+      "context": "status"
+    },
+    {
+      "zh": "不可用",
+      "en": "Unavailable",
+      "context": "status"
+    },
+    {
+      "zh": "已使用",
+      "en": "Used",
+      "context": "status"
+    },
+    {
+      "zh": "快过期",
+      "en": "Expiring soon",
+      "context": "status"
+    },
+    {
+      "zh": "全场",
+      "en": "General",
+      "context": "label"
+    },
+    {
+      "zh": "指定商品",
+      "en": "Selected items",
+      "context": "label"
+    },
+    {
+      "zh": "无门槛",
+      "en": "No minimum",
+      "context": "label"
+    },
+    {
+      "zh": "最高减",
+      "en": "Up to",
+      "context": "price"
+    },
+    {
+      "zh": "叠加",
+      "en": "Stackable",
+      "context": "label"
+    },
+    {
+      "zh": "不可叠加",
+      "en": "Can't stack",
+      "context": "label"
+    },
+    {
+      "zh": "有效期至",
+      "en": "Valid until",
+      "context": "label"
+    },
+    {
+      "zh": "使用说明",
+      "en": "How to use",
+      "context": "label"
+    },
+    {
+      "zh": "去领券",
+      "en": "Get coupons",
+      "context": "button"
+    },
+    {
+      "zh": "一键领取",
+      "en": "Claim all",
+      "context": "button"
+    },
+    {
+      "zh": "领取成功",
+      "en": "Claimed",
+      "context": "status"
+    },
+    {
+      "zh": "已抢光",
+      "en": "All claimed",
+      "context": "status"
+    },
+    {
+      "zh": "即将开始",
+      "en": "Starts soon",
+      "context": "status"
+    },
+    {
+      "zh": "距开始",
+      "en": "Starts in",
+      "context": "status"
+    },
+    {
+      "zh": "距结束",
+      "en": "Ends in",
+      "context": "status"
+    },
+    {
+      "zh": "天",
+      "en": "day",
+      "context": "label"
+    },
+    {
+      "zh": "时",
+      "en": "hr",
+      "context": "label"
+    },
+    {
+      "zh": "分",
+      "en": "min",
+      "context": "label"
+    },
+    {
+      "zh": "秒",
+      "en": "sec",
+      "context": "label"
+    },
+    {
+      "zh": "今日必抢",
+      "en": "Today's picks",
+      "context": "banner"
+    },
+    {
+      "zh": "爆款",
+      "en": "Hot item",
+      "context": "banner"
+    },
+    {
+      "zh": "热卖",
+      "en": "Hot",
+      "context": "banner"
+    },
+    {
+      "zh": "新品上新",
+      "en": "Just in",
+      "context": "banner"
+    },
+    {
+      "zh": "清仓",
+      "en": "Clearance",
+      "context": "banner"
+    },
+    {
+      "zh": "尾货",
+      "en": "Last stock",
+      "context": "banner"
+    },
+    {
+      "zh": "瑕疵仓",
+      "en": "Imperfects",
+      "context": "label"
+    },
+    {
+      "zh": "特价",
+      "en": "Special price",
+      "context": "price"
+    },
+    {
+      "zh": "限时秒杀",
+      "en": "Flash deals",
+      "context": "banner"
+    },
+    {
+      "zh": "整点抢",
+      "en": "Hourly drop",
+      "context": "banner"
+    },
+    {
+      "zh": "上午场",
+      "en": "Morning round",
+      "context": "label"
+    },
+    {
+      "zh": "下午场",
+      "en": "Afternoon round",
+      "context": "label"
+    },
+    {
+      "zh": "晚上场",
+      "en": "Evening round",
+      "context": "label"
+    },
+    {
+      "zh": "下场开抢",
+      "en": "Next round",
+      "context": "status"
+    },
+    {
+      "zh": "开抢中",
+      "en": "Live now",
+      "context": "status"
+    },
+    {
+      "zh": "已结束",
+      "en": "Ended",
+      "context": "status"
+    },
+    {
+      "zh": "提醒我",
+      "en": "Remind me",
+      "context": "button"
+    },
+    {
+      "zh": "已设提醒",
+      "en": "Reminder set",
+      "context": "status"
+    },
+    {
+      "zh": "取消提醒",
+      "en": "Cancel reminder",
+      "context": "button"
+    },
+    {
+      "zh": "预约",
+      "en": "Reserve",
+      "context": "button"
+    },
+    {
+      "zh": "已预约",
+      "en": "Reserved",
+      "context": "status"
+    },
+    {
+      "zh": "立即预约",
+      "en": "Reserve",
+      "context": "button"
+    },
+    {
+      "zh": "付定金",
+      "en": "Pay deposit",
+      "context": "button"
+    },
+    {
+      "zh": "付尾款",
+      "en": "Pay balance",
+      "context": "button"
+    },
+    {
+      "zh": "尾款支付",
+      "en": "Balance payment",
+      "context": "label"
+    },
+    {
+      "zh": "定金可退",
+      "en": "Deposit refundable",
+      "context": "label"
+    },
+    {
+      "zh": "预估",
+      "en": "Estimate",
+      "context": "label"
+    },
+    {
+      "zh": "约",
+      "en": "Approx",
+      "context": "label"
+    },
+    {
+      "zh": "起拍",
+      "en": "Starting bid",
+      "context": "price"
+    },
+    {
+      "zh": "当前价",
+      "en": "Current bid",
+      "context": "price"
+    },
+    {
+      "zh": "出价",
+      "en": "Bid",
+      "context": "button"
+    },
+    {
+      "zh": "领先",
+      "en": "Leading",
+      "context": "status"
+    },
+    {
+      "zh": "出局",
+      "en": "Outbid",
+      "context": "status"
+    },
+    {
+      "zh": "拍卖",
+      "en": "Auction",
+      "context": "label"
+    },
+    {
+      "zh": "一口价",
+      "en": "Buy now price",
+      "context": "price"
+    },
+    {
+      "zh": "邮费",
+      "en": "Shipping fee",
+      "context": "price"
+    },
+    {
+      "zh": "所在地",
+      "en": "Location",
+      "context": "label"
+    },
+    {
+      "zh": "卖家信用",
+      "en": "Seller rating",
+      "context": "review"
+    },
+    {
+      "zh": "描述相符",
+      "en": "As described",
+      "context": "review"
+    },
+    {
+      "zh": "物流服务",
+      "en": "Shipping score",
+      "context": "review"
+    },
+    {
+      "zh": "服务态度",
+      "en": "Service",
+      "context": "review"
+    },
+    {
+      "zh": "进入店铺",
+      "en": "Visit shop",
+      "context": "button"
+    },
+    {
+      "zh": "全部宝贝",
+      "en": "All listings",
+      "context": "label"
+    },
+    {
+      "zh": "查看分类",
+      "en": "Browse categories",
+      "context": "button"
+    },
+    {
+      "zh": "上新",
+      "en": "New in",
+      "context": "label"
+    },
+    {
+      "zh": "微详情",
+      "en": "Quick look",
+      "context": "label"
+    },
+    {
+      "zh": "种草",
+      "en": "Saved ideas",
+      "context": "label"
+    },
+    {
+      "zh": "发现",
+      "en": "Discover",
+      "context": "nav"
+    },
+    {
+      "zh": "已关注",
+      "en": "Following",
+      "context": "status"
+    },
+    {
+      "zh": "获赞",
+      "en": "Likes",
+      "context": "label"
+    },
+    {
+      "zh": "作品",
+      "en": "Posts",
+      "context": "label"
+    },
+    {
+      "zh": "直播中",
+      "en": "Live now",
+      "context": "status"
+    },
+    {
+      "zh": "回放",
+      "en": "Replay",
+      "context": "button"
+    },
+    {
+      "zh": "预约直播",
+      "en": "Remind me",
+      "context": "button"
+    },
+    {
+      "zh": "购物袋",
+      "en": "Bag",
+      "context": "nav"
+    },
+    {
+      "zh": "讲解中",
+      "en": "Now showing",
+      "context": "status"
+    },
+    {
+      "zh": "求讲解",
+      "en": "Ask to show",
+      "context": "button"
+    },
+    {
+      "zh": "马上抢",
+      "en": "Grab it",
+      "context": "button"
+    },
+    {
+      "zh": "已下架",
+      "en": "Unlisted",
+      "context": "status"
+    },
+    {
+      "zh": "商品已售罄",
+      "en": "Sold out",
+      "context": "status"
+    },
+    {
+      "zh": "看看别的",
+      "en": "See others",
+      "context": "button"
+    },
+    {
+      "zh": "申请调货",
+      "en": "Request restock",
+      "context": "button"
+    },
+    {
+      "zh": "相似商品",
+      "en": "Similar items",
+      "context": "label"
+    },
+    {
+      "zh": "同款",
+      "en": "Same style",
+      "context": "label"
+    },
+    {
+      "zh": "找同款",
+      "en": "Find this style",
+      "context": "button"
+    },
+    {
+      "zh": "以图搜图",
+      "en": "Search by photo",
+      "context": "button"
+    },
+    {
+      "zh": "拍照购",
+      "en": "Shop by photo",
+      "context": "button"
+    },
+    {
+      "zh": "扫一扫",
+      "en": "Scan",
+      "context": "button"
+    },
+    {
+      "zh": "我的足迹",
+      "en": "History",
+      "context": "nav"
+    },
+    {
+      "zh": "最近看过",
+      "en": "Recently viewed",
+      "context": "label"
+    },
+    {
+      "zh": "清空足迹",
+      "en": "Clear history",
+      "context": "button"
+    },
+    {
+      "zh": "管理",
+      "en": "Manage",
+      "context": "button"
+    },
+    {
+      "zh": "批量删除",
+      "en": "Delete selected",
+      "context": "button"
+    },
+    {
+      "zh": "移入收藏夹",
+      "en": "Save",
+      "context": "button"
+    },
+    {
+      "zh": "创建收藏夹",
+      "en": "New list",
+      "context": "button"
+    },
+    {
+      "zh": "收藏成功",
+      "en": "Saved",
+      "context": "status"
+    },
+    {
+      "zh": "取消收藏",
+      "en": "Unsaved",
+      "context": "status"
+    },
+    {
+      "zh": "分享给好友",
+      "en": "Share with friends",
+      "context": "button"
+    },
+    {
+      "zh": "生成海报",
+      "en": "Make a poster",
+      "context": "button"
+    },
+    {
+      "zh": "保存图片",
+      "en": "Save image",
+      "context": "button"
+    },
+    {
+      "zh": "更多分享",
+      "en": "More",
+      "context": "button"
+    },
+    {
+      "zh": "系统分享",
+      "en": "System share",
+      "context": "button"
+    },
+    {
+      "zh": "识别二维码",
+      "en": "Scan QR",
+      "context": "button"
+    },
+    {
+      "zh": "打开链接",
+      "en": "Open link",
+      "context": "button"
+    },
+    {
+      "zh": "安全提示",
+      "en": "Safety note",
+      "context": "label"
+    },
+    {
+      "zh": "官方验证",
+      "en": "Official check",
+      "context": "label"
+    },
+    {
+      "zh": "正品溯源",
+      "en": "Authenticity trace",
+      "context": "label"
+    },
+    {
+      "zh": "防伪码",
+      "en": "Security code",
+      "context": "label"
+    },
+    {
+      "zh": "查询真伪",
+      "en": "Verify authenticity",
+      "context": "button"
+    },
+    {
+      "zh": "质检报告",
+      "en": "QC report",
+      "context": "label"
+    },
+    {
+      "zh": "鉴定通过",
+      "en": "Authenticated",
+      "context": "status"
+    },
+    {
+      "zh": "支持验货",
+      "en": "Inspection OK",
+      "context": "label"
+    },
+    {
+      "zh": "七天无理由",
+      "en": "7-day no-reason returns",
+      "context": "label"
+    },
+    {
+      "zh": "运费险已含",
+      "en": "Shipping cover included",
+      "context": "label"
+    },
+    {
+      "zh": "过敏包退",
+      "en": "Allergy returns",
+      "context": "label"
+    },
+    {
+      "zh": "破损包赔",
+      "en": "Damage covered",
+      "context": "label"
+    },
+    {
+      "zh": "晚发必赔",
+      "en": "Late ship compensation",
+      "context": "label"
+    },
+    {
+      "zh": "价保",
+      "en": "Price guarantee",
+      "context": "label"
+    },
+    {
+      "zh": "买贵必赔",
+      "en": "Price-match refund",
+      "context": "label"
+    },
+    {
+      "zh": "假一赔四",
+      "en": "4× if fake",
+      "context": "label"
+    },
+    {
+      "zh": "退款成功",
+      "en": "Refunded",
+      "context": "status"
+    },
+    {
+      "zh": "退款失败",
+      "en": "Refund failed",
+      "context": "status"
+    },
+    {
+      "zh": "审核中",
+      "en": "Under review",
+      "context": "status"
+    },
+    {
+      "zh": "待寄回",
+      "en": "Awaiting return ship",
+      "context": "status"
+    },
+    {
+      "zh": "待商家收货",
+      "en": "Awaiting seller",
+      "context": "status"
+    },
+    {
+      "zh": "商家已收货",
+      "en": "Seller received",
+      "context": "status"
+    },
+    {
+      "zh": "换货中",
+      "en": "Exchanging",
+      "context": "status"
+    },
+    {
+      "zh": "已完成",
+      "en": "Completed",
+      "context": "status"
+    },
+    {
+      "zh": "已关闭",
+      "en": "Closed",
+      "context": "status"
+    },
+    {
+      "zh": "交易成功",
+      "en": "Success",
+      "context": "status"
+    },
+    {
+      "zh": "交易关闭",
+      "en": "Closed",
+      "context": "status"
+    },
+    {
+      "zh": "等待买家付款",
+      "en": "Awaiting payment",
+      "context": "status"
+    },
+    {
+      "zh": "等待卖家发货",
+      "en": "Awaiting shipment",
+      "context": "status"
+    },
+    {
+      "zh": "卖家已发货",
+      "en": "Shipped",
+      "context": "status"
+    },
+    {
+      "zh": "交易完成",
+      "en": "Complete",
+      "context": "status"
+    },
+    {
+      "zh": "退款/退货",
+      "en": "Refund / return",
+      "context": "label"
+    },
+    {
+      "zh": "投诉商家",
+      "en": "Report seller",
+      "context": "button"
+    },
+    {
+      "zh": "联系卖家",
+      "en": "Contact seller",
+      "context": "button"
+    },
+    {
+      "zh": "拨打电话",
+      "en": "Call",
+      "context": "button"
+    },
+    {
+      "zh": "复制号码",
+      "en": "Copy number",
+      "context": "button"
+    },
+    {
+      "zh": "加入黑名单",
+      "en": "Block",
+      "context": "button"
+    },
+    {
+      "zh": "取消黑名单",
+      "en": "Unblock",
+      "context": "button"
+    },
+    {
+      "zh": "设置备注",
+      "en": "Set note",
+      "context": "button"
+    },
+    {
+      "zh": "标为已读",
+      "en": "Mark read",
+      "context": "button"
+    },
+    {
+      "zh": "标星",
+      "en": "Star",
+      "context": "button"
+    },
+    {
+      "zh": "删除会话",
+      "en": "Delete chat",
+      "context": "button"
+    },
+    {
+      "zh": "图片",
+      "en": "Image",
+      "context": "label"
+    },
+    {
+      "zh": "拍摄",
+      "en": "Camera",
+      "context": "button"
+    },
+    {
+      "zh": "相册",
+      "en": "Album",
+      "context": "label"
+    },
+    {
+      "zh": "视频",
+      "en": "Video",
+      "context": "label"
+    },
+    {
+      "zh": "语音",
+      "en": "Voice",
+      "context": "label"
+    },
+    {
+      "zh": "发送",
+      "en": "Send",
+      "context": "button"
+    },
+    {
+      "zh": "按住说话",
+      "en": "Hold to talk",
+      "context": "label"
+    },
+    {
+      "zh": "松开发送",
+      "en": "Release to send",
+      "context": "label"
+    },
+    {
+      "zh": "你可能想问",
+      "en": "You might ask",
+      "context": "label"
+    },
+    {
+      "zh": "常见问题",
+      "en": "FAQ",
+      "context": "label"
+    },
+    {
+      "zh": "未读",
+      "en": "Unread",
+      "context": "status"
+    },
+    {
+      "zh": "消息",
+      "en": "Messages",
+      "context": "nav"
+    },
+    {
+      "zh": "通知",
+      "en": "Notifications",
+      "context": "nav"
+    },
+    {
+      "zh": "交易物流",
+      "en": "Orders & shipping",
+      "context": "label"
+    },
+    {
+      "zh": "优惠促销",
+      "en": "Promotions",
+      "context": "label"
+    },
+    {
+      "zh": "账户通知",
+      "en": "Account notices",
+      "context": "label"
+    },
+    {
+      "zh": "互动",
+      "en": "Interactions",
+      "context": "label"
+    },
+    {
+      "zh": "赞和收藏",
+      "en": "Likes & saves",
+      "context": "label"
+    },
+    {
+      "zh": "新增关注",
+      "en": "New followers",
+      "context": "label"
+    },
+    {
+      "zh": "评论",
+      "en": "Comments",
+      "context": "label"
+    },
+    {
+      "zh": "清空未读",
+      "en": "Clear unread",
+      "context": "button"
+    },
+    {
+      "zh": "消息免打扰",
+      "en": "Mute",
+      "context": "button"
+    },
+    {
+      "zh": "置顶",
+      "en": "Pin",
+      "context": "button"
+    },
+    {
+      "zh": "取消置顶",
+      "en": "Unpin",
+      "context": "button"
+    },
+    {
+      "zh": "开启通知",
+      "en": "Turn on notifications",
+      "context": "button"
+    },
+    {
+      "zh": "去开启",
+      "en": "Turn on",
+      "context": "button"
+    },
+    {
+      "zh": "允许通知",
+      "en": "Allow notifications",
+      "context": "button"
+    },
+    {
+      "zh": "隐私设置",
+      "en": "Privacy",
+      "context": "label"
+    },
+    {
+      "zh": "个人信息",
+      "en": "Personal info",
+      "context": "label"
+    },
+    {
+      "zh": "账号与安全",
+      "en": "Account & security",
+      "context": "label"
+    },
+    {
+      "zh": "支付设置",
+      "en": "Payment settings",
+      "context": "label"
+    },
+    {
+      "zh": "地址管理",
+      "en": "Addresses",
+      "context": "label"
+    },
+    {
+      "zh": "退出登录",
+      "en": "Log out",
+      "context": "button"
+    },
+    {
+      "zh": "切换账号",
+      "en": "Switch account",
+      "context": "button"
+    },
+    {
+      "zh": "关于",
+      "en": "About",
+      "context": "label"
+    },
+    {
+      "zh": "检查更新",
+      "en": "Check for updates",
+      "context": "button"
+    },
+    {
+      "zh": "清除缓存",
+      "en": "Clear cache",
+      "context": "button"
+    },
+    {
+      "zh": "当前版本",
+      "en": "Version",
+      "context": "label"
+    },
+    {
+      "zh": "用户协议",
+      "en": "Terms",
+      "context": "label"
+    },
+    {
+      "zh": "隐私政策",
+      "en": "Privacy policy",
+      "context": "label"
+    },
+    {
+      "zh": "第三方共享",
+      "en": "Third-party sharing",
+      "context": "label"
+    },
+    {
+      "zh": "权限管理",
+      "en": "Permissions",
+      "context": "label"
+    },
+    {
+      "zh": "存储",
+      "en": "Storage",
+      "context": "label"
+    },
+    {
+      "zh": "相机",
+      "en": "Camera",
+      "context": "label"
+    },
+    {
+      "zh": "麦克风",
+      "en": "Microphone",
+      "context": "label"
+    },
+    {
+      "zh": "位置",
+      "en": "Location",
+      "context": "label"
+    },
+    {
+      "zh": "通讯录",
+      "en": "Contacts",
+      "context": "label"
+    },
+    {
+      "zh": "已允许",
+      "en": "Allowed",
+      "context": "status"
+    },
+    {
+      "zh": "去授权",
+      "en": "Grant access",
+      "context": "button"
+    },
+    {
+      "zh": "仅使用期间允许",
+      "en": "While using",
+      "context": "label"
+    },
+    {
+      "zh": "始终允许",
+      "en": "Always",
+      "context": "label"
+    },
+    {
+      "zh": "拒绝",
+      "en": "Deny",
+      "context": "button"
+    },
+    {
+      "zh": "本次允许",
+      "en": "Only this time",
+      "context": "button"
+    },
+    {
+      "zh": "网络未连接",
+      "en": "You're offline",
+      "context": "status"
+    },
+    {
+      "zh": "请检查网络",
+      "en": "Check your connection",
+      "context": "status"
+    },
+    {
+      "zh": "服务器繁忙",
+      "en": "Server is busy",
+      "context": "status"
+    },
+    {
+      "zh": "稍后再试",
+      "en": "Try again shortly",
+      "context": "button"
+    },
+    {
+      "zh": "页面出错",
+      "en": "Page error",
+      "context": "status"
+    },
+    {
+      "zh": "返回首页",
+      "en": "Back home",
+      "context": "button"
+    },
+    {
+      "zh": "重新加载",
+      "en": "Reload",
+      "context": "button"
+    },
+    {
+      "zh": "正在加载",
+      "en": "Loading",
+      "context": "status"
+    },
+    {
+      "zh": "请稍候",
+      "en": "Please wait",
+      "context": "status"
+    },
+    {
+      "zh": "操作成功",
+      "en": "Done",
+      "context": "status"
+    },
+    {
+      "zh": "操作失败",
+      "en": "Couldn't do that",
+      "context": "status"
+    },
+    {
+      "zh": "已复制",
+      "en": "Copied",
+      "context": "status"
+    },
+    {
+      "zh": "请输入搜索词",
+      "en": "Type to search",
+      "context": "label"
+    },
+    {
+      "zh": "历史搜索",
+      "en": "Recent searches",
+      "context": "label"
+    },
+    {
+      "zh": "热门搜索",
+      "en": "Trending",
+      "context": "label"
+    },
+    {
+      "zh": "搜索发现",
+      "en": "Discover",
+      "context": "label"
+    },
+    {
+      "zh": "换一批",
+      "en": "Shuffle",
+      "context": "button"
+    },
+    {
+      "zh": "你可能想搜",
+      "en": "Try searching",
+      "context": "label"
+    },
+    {
+      "zh": "在结果中搜索",
+      "en": "Search within",
+      "context": "label"
+    },
+    {
+      "zh": "综合排序",
+      "en": "Best match",
+      "context": "label"
+    },
+    {
+      "zh": "信用",
+      "en": "Rating",
+      "context": "label"
+    },
+    {
+      "zh": "价格区间",
+      "en": "Price range",
+      "context": "label"
+    },
+    {
+      "zh": "最低价",
+      "en": "Min",
+      "context": "price"
+    },
+    {
+      "zh": "最高价",
+      "en": "Max",
+      "context": "price"
+    },
+    {
+      "zh": "企业店",
+      "en": "Business shop",
+      "context": "label"
+    },
+    {
+      "zh": "个人",
+      "en": "Individual",
+      "context": "label"
+    },
+    {
+      "zh": "全球购",
+      "en": "Cross-border",
+      "context": "label"
+    },
+    {
+      "zh": "保税仓",
+      "en": "Bonded warehouse",
+      "context": "label"
+    },
+    {
+      "zh": "海外直邮",
+      "en": "Overseas direct",
+      "context": "shipping"
+    },
+    {
+      "zh": "国内现货",
+      "en": "Local stock",
+      "context": "label"
+    },
+    {
+      "zh": "预计关税",
+      "en": "Est. duty",
+      "context": "price"
+    },
+    {
+      "zh": "税",
+      "en": "Tax",
+      "context": "label"
+    },
+    {
+      "zh": "包税",
+      "en": "Tax included",
+      "context": "label"
+    },
+    {
+      "zh": "不包税",
+      "en": "Duty extra",
+      "context": "label"
+    },
+    {
+      "zh": "尺码推荐",
+      "en": "Size advice",
+      "context": "label"
+    },
+    {
+      "zh": "根据身高体重",
+      "en": "Based on height & weight",
+      "context": "label"
+    },
+    {
+      "zh": "推荐尺码",
+      "en": "Suggested size",
+      "context": "label"
+    },
+    {
+      "zh": "手动选择",
+      "en": "Choose manually",
+      "context": "button"
+    },
+    {
+      "zh": "童装",
+      "en": "Kids",
+      "context": "label"
+    },
+    {
+      "zh": "女装",
+      "en": "Women",
+      "context": "label"
+    },
+    {
+      "zh": "男装",
+      "en": "Men",
+      "context": "label"
+    },
+    {
+      "zh": "鞋靴",
+      "en": "Shoes",
+      "context": "label"
+    },
+    {
+      "zh": "箱包",
+      "en": "Bags",
+      "context": "label"
+    },
+    {
+      "zh": "美妆",
+      "en": "Beauty",
+      "context": "label"
+    },
+    {
+      "zh": "食品",
+      "en": "Food",
+      "context": "label"
+    },
+    {
+      "zh": "数码",
+      "en": "Electronics",
+      "context": "label"
+    },
+    {
+      "zh": "家居",
+      "en": "Home",
+      "context": "label"
+    },
+    {
+      "zh": "母婴",
+      "en": "Baby",
+      "context": "label"
+    },
+    {
+      "zh": "运动",
+      "en": "Sports",
+      "context": "label"
+    },
+    {
+      "zh": "内衣",
+      "en": "Lingerie",
+      "context": "label"
+    },
+    {
+      "zh": "配饰",
+      "en": "Accessories",
+      "context": "label"
+    },
+    {
+      "zh": "汽车",
+      "en": "Car",
+      "context": "label"
+    },
+    {
+      "zh": "图书",
+      "en": "Books",
+      "context": "label"
+    },
+    {
+      "zh": "宠物",
+      "en": "Pets",
+      "context": "label"
+    },
+    {
+      "zh": "生鲜",
+      "en": "Fresh",
+      "context": "label"
+    },
+    {
+      "zh": "水果",
+      "en": "Fruit",
+      "context": "label"
+    },
+    {
+      "zh": "蔬菜",
+      "en": "Veg",
+      "context": "label"
+    },
+    {
+      "zh": "肉禽",
+      "en": "Meat",
+      "context": "label"
+    },
+    {
+      "zh": "海鲜",
+      "en": "Seafood",
+      "context": "label"
+    },
+    {
+      "zh": "零食",
+      "en": "Snacks",
+      "context": "label"
+    },
+    {
+      "zh": "饮料",
+      "en": "Drinks",
+      "context": "label"
+    },
+    {
+      "zh": "酒水",
+      "en": "Alcohol",
+      "context": "label"
+    },
+    {
+      "zh": "日用",
+      "en": "Daily",
+      "context": "label"
+    },
+    {
+      "zh": "清洁",
+      "en": "Cleaning",
+      "context": "label"
+    },
+    {
+      "zh": "纸品",
+      "en": "Paper",
+      "context": "label"
+    },
+    {
+      "zh": "医药",
+      "en": "Pharmacy",
+      "context": "label"
+    },
+    {
+      "zh": "处方药",
+      "en": "Prescription",
+      "context": "label"
+    },
+    {
+      "zh": "非处方",
+      "en": "OTC",
+      "context": "label"
+    },
+    {
+      "zh": "冷链",
+      "en": "Cold chain",
+      "context": "shipping"
+    },
+    {
+      "zh": "冰鲜",
+      "en": "Chilled",
+      "context": "label"
+    },
+    {
+      "zh": "冷冻",
+      "en": "Frozen",
+      "context": "label"
+    },
+    {
+      "zh": "常温",
+      "en": "Shelf stable",
+      "context": "label"
+    },
+    {
+      "zh": "生产日期",
+      "en": "Produced",
+      "context": "label"
+    },
+    {
+      "zh": "保质期",
+      "en": "Shelf life",
+      "context": "label"
+    },
+    {
+      "zh": "到期",
+      "en": "Expires",
+      "context": "label"
+    },
+    {
+      "zh": "净含量",
+      "en": "Net",
+      "context": "label"
+    },
+    {
+      "zh": "规格参数",
+      "en": "Specifications",
+      "context": "label"
+    },
+    {
+      "zh": "品牌故事",
+      "en": "Brand story",
+      "context": "label"
+    },
+    {
+      "zh": "售后政策",
+      "en": "After-sales policy",
+      "context": "label"
+    },
+    {
+      "zh": "价格说明",
+      "en": "Price notes",
+      "context": "label"
+    },
+    {
+      "zh": "划线价",
+      "en": "List price",
+      "context": "price"
+    },
+    {
+      "zh": "被比较价格",
+      "en": "Compared price",
+      "context": "price"
+    },
+    {
+      "zh": "立即加购",
+      "en": "Add",
+      "context": "button"
+    },
+    {
+      "zh": "去购物车",
+      "en": "Cart",
+      "context": "button"
+    },
+    {
+      "zh": "购物车是空的",
+      "en": "Your cart is empty",
+      "context": "status"
+    },
+    {
+      "zh": "去挑点喜欢的",
+      "en": "Find something you like",
+      "context": "button"
+    },
+    {
+      "zh": "失效宝贝",
+      "en": "Unavailable items",
+      "context": "label"
+    },
+    {
+      "zh": "清空失效",
+      "en": "Clear unavailable",
+      "context": "button"
+    },
+    {
+      "zh": "领券结算",
+      "en": "Checkout with coupons",
+      "context": "button"
+    },
+    {
+      "zh": "商品合计",
+      "en": "Items",
+      "context": "price"
+    },
+    {
+      "zh": "店铺优惠",
+      "en": "Shop offers",
+      "context": "price"
+    },
+    {
+      "zh": "跨店优惠",
+      "en": "Cross-shop offers",
+      "context": "price"
+    },
+    {
+      "zh": "红包抵扣",
+      "en": "Red packet",
+      "context": "price"
+    },
+    {
+      "zh": "金币抵扣",
+      "en": "Coins",
+      "context": "price"
+    },
+    {
+      "zh": "合计应付",
+      "en": "Amount due",
+      "context": "price"
+    },
+    {
+      "zh": "明细",
+      "en": "Breakdown",
+      "context": "label"
+    },
+    {
+      "zh": "开发票",
+      "en": "Invoice",
+      "context": "button"
+    },
+    {
+      "zh": "不开发票",
+      "en": "No invoice",
+      "context": "label"
+    },
+    {
+      "zh": "电子发票",
+      "en": "E-invoice",
+      "context": "label"
+    },
+    {
+      "zh": "纸质发票",
+      "en": "Paper invoice",
+      "context": "label"
+    },
+    {
+      "zh": "个人抬头",
+      "en": "Personal",
+      "context": "label"
+    },
+    {
+      "zh": "企业抬头",
+      "en": "Company",
+      "context": "label"
+    },
+    {
+      "zh": "税号",
+      "en": "Tax ID",
+      "context": "label"
+    },
+    {
+      "zh": "订单已提交",
+      "en": "Order placed",
+      "context": "status"
+    },
+    {
+      "zh": "支付剩余时间",
+      "en": "Pay within",
+      "context": "status"
+    },
+    {
+      "zh": "去支付",
+      "en": "Pay",
+      "context": "button"
+    },
+    {
+      "zh": "取消订单",
+      "en": "Cancel order",
+      "context": "button"
+    },
+    {
+      "zh": "修改订单",
+      "en": "Edit order",
+      "context": "button"
+    },
+    {
+      "zh": "我想取消",
+      "en": "I want to cancel",
+      "context": "label"
+    },
+    {
+      "zh": "不想要了",
+      "en": "Changed my mind",
+      "context": "label"
+    },
+    {
+      "zh": "拍错了",
+      "en": "Ordered by mistake",
+      "context": "label"
+    },
+    {
+      "zh": "地址错了",
+      "en": "Wrong address",
+      "context": "label"
+    },
+    {
+      "zh": "价格变化",
+      "en": "Price changed",
+      "context": "label"
+    },
+    {
+      "zh": "其他原因",
+      "en": "Other",
+      "context": "label"
+    },
+    {
+      "zh": "请选择原因",
+      "en": "Choose a reason",
+      "context": "label"
+    },
+    {
+      "zh": "确认取消",
+      "en": "Confirm cancel",
+      "context": "button"
+    },
+    {
+      "zh": "再想想",
+      "en": "Keep it",
+      "context": "button"
+    },
+    {
+      "zh": "订单已取消",
+      "en": "Order cancelled",
+      "context": "status"
+    },
+    {
+      "zh": "钱款将原路退回",
+      "en": "Refund returns to your payment method",
+      "context": "label"
+    },
+    {
+      "zh": "查看订单",
+      "en": "View order",
+      "context": "button"
+    },
+    {
+      "zh": "再逛逛",
+      "en": "Keep browsing",
+      "context": "button"
+    },
+    {
+      "zh": "看了又看",
+      "en": "Also viewed",
+      "context": "label"
+    },
+    {
+      "zh": "买了又买",
+      "en": "Often bought with",
+      "context": "label"
+    },
+    {
+      "zh": "店铺热卖",
+      "en": "Shop bestsellers",
+      "context": "label"
+    },
+    {
+      "zh": "搭配推荐",
+      "en": "Pairs with",
+      "context": "label"
+    },
+    {
+      "zh": "组合购",
+      "en": "Bundle",
+      "context": "label"
+    },
+    {
+      "zh": "一起买",
+      "en": "Buy together",
+      "context": "button"
+    },
+    {
+      "zh": "省",
+      "en": "Save",
+      "context": "price"
+    },
+    {
+      "zh": "已满包邮",
+      "en": "Free shipping unlocked",
+      "context": "status"
+    },
+    {
+      "zh": "加购成功",
+      "en": "Added to cart",
+      "context": "status"
+    },
+    {
+      "zh": "已在购物车中",
+      "en": "Already in cart",
+      "context": "status"
+    },
+    {
+      "zh": "库存不足",
+      "en": "Not enough stock",
+      "context": "status"
+    },
+    {
+      "zh": "超过限购",
+      "en": "Over the limit",
+      "context": "status"
+    },
+    {
+      "zh": "请先选择规格",
+      "en": "Pick options first",
+      "context": "status"
+    },
+    {
+      "zh": "首件折扣",
+      "en": "First-item discount",
+      "context": "banner"
+    },
+    {
+      "zh": "透气网面",
+      "en": "Breathable mesh",
+      "context": "title"
+    },
+    {
+      "zh": "文具套装",
+      "en": "Stationery set",
+      "context": "title"
+    },
+    {
+      "zh": "12件盲盒套装",
+      "en": "12-piece blind box set",
+      "context": "title"
+    },
+    {
+      "zh": "儿童玩具",
+      "en": "Kids' toys",
+      "context": "title"
+    },
+    {
+      "zh": "5元券",
+      "en": "¥5 coupon",
+      "context": "price"
+    },
+    {
+      "zh": "9,999+人已抢购",
+      "en": "9,999+ bought",
+      "context": "status"
+    },
+    {
+      "zh": "支付成功",
+      "en": "Payment successful",
+      "context": "status"
+    },
+    {
+      "zh": "收货地址",
+      "en": "Shipping address",
+      "context": "label"
+    },
+    {
+      "zh": "收银台",
+      "en": "Checkout",
+      "context": "label"
+    },
+    {
+      "zh": "支付密码",
+      "en": "Payment password",
+      "context": "label"
+    },
+    {
+      "zh": "客服消息",
+      "en": "Support messages",
+      "context": "label"
+    },
+    {
+      "zh": "旺旺留言",
+      "en": "Message seller",
+      "context": "label"
+    },
+    {
+      "zh": "微信支付",
+      "en": "WeChat Pay",
+      "context": "label"
+    },
+    {
+      "zh": "支付宝",
+      "en": "Alipay",
+      "context": "label"
+    },
+    {
+      "zh": "花呗",
+      "en": "Pay later",
+      "context": "label"
+    },
+    {
+      "zh": "白条",
+      "en": "Credit pay",
+      "context": "label"
+    },
+    {
+      "zh": "复制淘口令",
+      "en": "Copy share code",
+      "context": "button"
+    },
+    {
+      "zh": "百亿补贴",
+      "en": "Heavy subsidy",
+      "context": "banner"
+    },
+    {
+      "zh": "微信好友",
+      "en": "WeChat friend",
+      "context": "label"
+    },
+    {
+      "zh": "朋友圈",
+      "en": "Moments",
+      "context": "label"
+    },
+    {
+      "zh": "微博",
+      "en": "Weibo",
+      "context": "label"
+    },
+    {
+      "zh": "欧码",
+      "en": "EU size",
+      "context": "label"
+    },
+    {
+      "zh": "美码",
+      "en": "US size",
+      "context": "label"
+    },
+    {
+      "zh": "码",
+      "en": "size",
+      "context": "label"
+    },
+    {
+      "zh": "加购",
+      "en": "Add",
+      "context": "button"
+    },
+    {
+      "zh": "立抢",
+      "en": "Grab",
+      "context": "button"
+    },
+    {
+      "zh": "马上领",
+      "en": "Claim",
+      "context": "button"
+    },
+    {
+      "zh": "去拼单",
+      "en": "Join group",
+      "context": "button"
+    },
+    {
+      "zh": "免运费",
+      "en": "No shipping fee",
+      "context": "shipping"
+    },
+    {
+      "zh": "正品",
+      "en": "Authentic",
+      "context": "label"
+    },
+    {
+      "zh": "现货",
+      "en": "In stock",
+      "context": "status"
+    },
+    {
+      "zh": "预估到手价",
+      "en": "Est. your price",
+      "context": "price"
+    },
+    {
+      "zh": "店铺满减",
+      "en": "Shop spend & save",
+      "context": "label"
+    },
+    {
+      "zh": "限时",
+      "en": "Limited time",
+      "context": "label"
+    },
+    {
+      "zh": "仅剩",
+      "en": "Only left",
+      "context": "status"
+    },
+    {
+      "zh": "即将售罄",
+      "en": "Almost gone",
+      "context": "status"
+    },
+    {
+      "zh": "热销",
+      "en": "Bestseller",
+      "context": "label"
+    },
+    {
+      "zh": "回购",
+      "en": "Buy again",
+      "context": "label"
+    },
+    {
+      "zh": "好评如潮",
+      "en": "Loved by buyers",
+      "context": "review"
+    },
+    {
+      "zh": "描述",
+      "en": "Description",
+      "context": "label"
+    },
+    {
+      "zh": "服务",
+      "en": "Service",
+      "context": "label"
+    },
+    {
+      "zh": "物流速度",
+      "en": "Shipping speed",
+      "context": "label"
+    },
+    {
+      "zh": "匿名评价",
+      "en": "Anonymous review",
+      "context": "label"
+    },
+    {
+      "zh": "默认好评",
+      "en": "Auto positive",
+      "context": "review"
+    },
+    {
+      "zh": "查看更多",
+      "en": "See more",
+      "context": "button"
+    },
+    {
+      "zh": "收起详情",
+      "en": "Hide details",
+      "context": "button"
+    },
+    {
+      "zh": "商品详情",
+      "en": "Product details",
+      "context": "label"
+    },
+    {
+      "zh": "店铺评分",
+      "en": "Shop score",
+      "context": "review"
+    },
+    {
+      "zh": "关注店铺",
+      "en": "Follow shop",
+      "context": "button"
+    },
+    {
+      "zh": "全部评价",
+      "en": "All reviews",
+      "context": "label"
+    },
+    {
+      "zh": "带图评价",
+      "en": "Reviews with photos",
+      "context": "label"
+    },
+    {
+      "zh": "最新",
+      "en": "Newest",
+      "context": "label"
+    },
+    {
+      "zh": "尺寸",
+      "en": "Dimensions",
+      "context": "label"
+    },
+    {
+      "zh": "材质",
+      "en": "Material",
+      "context": "label"
+    },
+    {
+      "zh": "产地",
+      "en": "Origin",
+      "context": "label"
+    },
+    {
+      "zh": "适用",
+      "en": "Suitable for",
+      "context": "label"
+    },
+    {
+      "zh": "洗涤",
+      "en": "Care",
+      "context": "label"
+    },
+    {
+      "zh": "容量",
+      "en": "Capacity",
+      "context": "label"
+    },
+    {
+      "zh": "功率",
+      "en": "Power",
+      "context": "label"
+    },
+    {
+      "zh": "保修",
+      "en": "Warranty",
+      "context": "label"
+    },
+    {
+      "zh": "一年保修",
+      "en": "1-year warranty",
+      "context": "label"
+    },
+    {
+      "zh": "全国联保",
+      "en": "Nationwide warranty",
+      "context": "label"
+    },
+    {
+      "zh": "到店",
+      "en": "In store",
+      "context": "label"
+    },
+    {
+      "zh": "门店",
+      "en": "Store",
+      "context": "label"
+    },
+    {
+      "zh": "自提",
+      "en": "Pickup",
+      "context": "shipping"
+    },
+    {
+      "zh": "预约安装",
+      "en": "Book installation",
+      "context": "button"
+    },
+    {
+      "zh": "送装",
+      "en": "Delivery & setup",
+      "context": "shipping"
+    },
+    {
+      "zh": "以旧换新",
+      "en": "Trade-in",
+      "context": "label"
+    },
+    {
+      "zh": "加购凑单",
+      "en": "Add to unlock the deal",
+      "context": "button"
+    },
+    {
+      "zh": "凑单",
+      "en": "Complete the deal",
+      "context": "button"
+    },
+    {
+      "zh": "再逛逛店铺",
+      "en": "Browse the shop",
+      "context": "button"
+    },
+    {
+      "zh": "进店逛逛",
+      "en": "Visit the shop",
+      "context": "button"
+    },
+    {
+      "zh": "黑色",
+      "en": "Black",
+      "context": "label"
+    },
+    {
+      "zh": "白色",
+      "en": "White",
+      "context": "label"
+    },
+    {
+      "zh": "红色",
+      "en": "Red",
+      "context": "label"
+    },
+    {
+      "zh": "蓝色",
+      "en": "Blue",
+      "context": "label"
+    },
+    {
+      "zh": "灰色",
+      "en": "Grey",
+      "context": "label"
+    },
+    {
+      "zh": "米色",
+      "en": "Beige",
+      "context": "label"
+    },
+    {
+      "zh": "粉色",
+      "en": "Pink",
+      "context": "label"
+    },
+    {
+      "zh": "绿色",
+      "en": "Green",
+      "context": "label"
+    },
+    {
+      "zh": "棕色",
+      "en": "Brown",
+      "context": "label"
+    },
+    {
+      "zh": "紫色",
+      "en": "Purple",
+      "context": "label"
+    },
+    {
+      "zh": "黄色",
+      "en": "Yellow",
+      "context": "label"
+    },
+    {
+      "zh": "橙色",
+      "en": "Orange",
+      "context": "label"
+    },
+    {
+      "zh": "卡其",
+      "en": "Khaki",
+      "context": "label"
+    },
+    {
+      "zh": "藏青",
+      "en": "Navy",
+      "context": "label"
+    },
+    {
+      "zh": "军绿",
+      "en": "Army green",
+      "context": "label"
+    },
+    {
+      "zh": "杏色",
+      "en": "Apricot",
+      "context": "label"
+    },
+    {
+      "zh": "酒红",
+      "en": "Burgundy",
+      "context": "label"
+    },
+    {
+      "zh": "咖色",
+      "en": "Coffee",
+      "context": "label"
+    },
+    {
+      "zh": "银色",
+      "en": "Silver",
+      "context": "label"
+    },
+    {
+      "zh": "金色",
+      "en": "Gold",
+      "context": "label"
+    }
+  ]
+}
